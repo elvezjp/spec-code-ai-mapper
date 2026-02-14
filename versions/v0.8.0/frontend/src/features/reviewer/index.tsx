@@ -368,13 +368,12 @@ export function Reviewer() {
           {toastMessage}
         </div>
       )}
-      <Layout>
-        <ScreenContainer
-          currentScreen={currentScreen}
-          mainScreen={
-            <>
-              {/* Header */}
-              <Header
+      <ScreenContainer
+        currentScreen={currentScreen}
+        mainScreen={
+          <Layout>
+            {/* Header */}
+            <Header
                 title={APP_INFO.description}
                 leftContent={
                   <VersionSelector
@@ -531,18 +530,24 @@ export function Reviewer() {
                   </p>
                 )}
               </Card>
-            </>
-          }
-          executingScreen={
+          </Layout>
+        }
+        executingScreen={
+          <Layout>
             <MappingExecutingScreen
               isExecuting={isMapping}
               error={mappingError}
               onBack={handleBackFromExecuting}
               onRetry={handleMapping}
             />
-          }
-          resultScreen={
-            mappingResult && mappingMeta ? (
+          </Layout>
+        }
+        resultScreen={
+          /* 結果画面: Traceability Matrixテーブルの内容に応じて幅が変わるため、
+             Layout (max-w-4xl) ではなくフル幅コンテナを使用。
+             各セクションの幅揃えは MappingResult 内の w-fit コンテナで制御。 */
+          mappingResult && mappingMeta ? (
+            <div className="mx-auto p-6">
               <MappingResult
                 mappingResult={mappingResult}
                 executionMeta={mappingMeta}
@@ -552,33 +557,33 @@ export function Reviewer() {
                 onDownloadZip={handleDownloadZip}
                 onBack={handleBackFromResult}
               />
-            ) : undefined
-          }
-        />
+            </div>
+          ) : undefined
+        }
+      />
 
-        {/* Settings modal */}
-        <SettingsModal
-          isOpen={settingsModal.isOpen}
-          onClose={settingsModal.close}
-          appInfo={APP_INFO}
-          llmSettings={
-            reviewerConfig?.llm
-              ? { ...reviewerConfig.llm, selectedModel }
-              : undefined
-          }
-          onModelChange={setSelectedModel}
-          onConfigFileLoad={handleConfigFileLoad}
-          onSaveToStorage={saveConfigToBrowser}
-          onClearStorage={clearSavedConfig}
-          loadedConfigFilename={configFilename || undefined}
-          configLoadStatus={configLoadStatus || undefined}
-          isConfigSavedToBrowser={hasSavedConfig()}
-          isConfigModified={configModified}
-          onTestConnection={handleTestConnection}
-          isSystemFallback={!reviewerConfig?.llm}
-          extensionSections={[<SpecTypesSection key="spec-types" specTypes={specTypesConfig} />]}
-        />
-      </Layout>
+      {/* Settings modal */}
+      <SettingsModal
+        isOpen={settingsModal.isOpen}
+        onClose={settingsModal.close}
+        appInfo={APP_INFO}
+        llmSettings={
+          reviewerConfig?.llm
+            ? { ...reviewerConfig.llm, selectedModel }
+            : undefined
+        }
+        onModelChange={setSelectedModel}
+        onConfigFileLoad={handleConfigFileLoad}
+        onSaveToStorage={saveConfigToBrowser}
+        onClearStorage={clearSavedConfig}
+        loadedConfigFilename={configFilename || undefined}
+        configLoadStatus={configLoadStatus || undefined}
+        isConfigSavedToBrowser={hasSavedConfig()}
+        isConfigModified={configModified}
+        onTestConnection={handleTestConnection}
+        isSystemFallback={!reviewerConfig?.llm}
+        extensionSections={[<SpecTypesSection key="spec-types" specTypes={specTypesConfig} />]}
+      />
     </>
   )
 }
