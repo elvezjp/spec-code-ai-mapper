@@ -39,8 +39,6 @@ export function MappingResult({
   ).size
 
   return (
-    {/* 全セクションを w-fit で囲み、最も幅の広いセクション（Traceability Matrix テーブル）に
-         他セクションの幅を揃える。min-w-[56rem] で最低 max-w-4xl 相当を確保。 */}
     <div className="w-fit max-w-full mx-auto min-w-[56rem]">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
