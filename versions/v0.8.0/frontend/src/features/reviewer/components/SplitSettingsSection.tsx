@@ -27,6 +27,7 @@ export function SplitSettingsSection({
   codeFilenames,
 }: SplitSettingsSectionProps) {
   const [isOptionsExpanded, setIsOptionsExpanded] = useState(true)
+  const [isPreviewExpanded, setIsPreviewExpanded] = useState(true)
   const prevHasDesignDocRef = useRef(hasDesignDoc)
   const prevHasCodeFilesRef = useRef(hasCodeFiles)
 
@@ -182,30 +183,40 @@ export function SplitSettingsSection({
       {/* プレビュー結果 */}
       {previewResult && (
         <div className="border-t border-gray-200 pt-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">プレビュー結果</h3>
+          <button
+            type="button"
+            onClick={() => setIsPreviewExpanded(!isPreviewExpanded)}
+            className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900"
+          >
+            {isPreviewExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            プレビュー結果
+          </button>
+          {isPreviewExpanded && (
+            <div className="mt-3 max-h-96 overflow-y-auto">
+              {/* 設計書パーツ */}
+              {previewResult.documentParts && previewResult.documentParts.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-gray-600 mb-2">
+                    ■ 設計書: {previewResult.documentParts.length} パート
+                  </h4>
+                  <DocumentPartsTable parts={previewResult.documentParts} />
+                </div>
+              )}
 
-          {/* 設計書パーツ */}
-          {previewResult.documentParts && previewResult.documentParts.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">
-                ■ 設計書: {previewResult.documentParts.length} パート
-              </h4>
-              <DocumentPartsTable parts={previewResult.documentParts} />
-            </div>
-          )}
-
-          {/* コードパーツ */}
-          {previewResult.codeParts && previewResult.codeParts.length > 0 && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 mb-2">
-                ■ プログラム: {previewResult.codeParts.length} パート
-                {previewResult.codeLanguage && (
-                  <span className="ml-2 text-xs text-gray-500">
-                    ({previewResult.codeLanguage})
-                  </span>
-                )}
-              </h4>
-              <CodePartsTable parts={previewResult.codeParts} />
+              {/* コードパーツ */}
+              {previewResult.codeParts && previewResult.codeParts.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-600 mb-2">
+                    ■ プログラム: {previewResult.codeParts.length} パート
+                    {previewResult.codeLanguage && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        ({previewResult.codeLanguage})
+                      </span>
+                    )}
+                  </h4>
+                  <CodePartsTable parts={previewResult.codeParts} />
+                </div>
+              )}
             </div>
           )}
         </div>

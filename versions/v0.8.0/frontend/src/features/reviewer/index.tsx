@@ -470,6 +470,21 @@ export function Reviewer() {
                 />
               </Card>
 
+              {/* Split settings */}
+              <div className="mb-6">
+                <SplitSettingsSection
+                  settings={splitSettings}
+                  onSettingsChange={setSplitSettings}
+                  previewResult={splitPreviewResult}
+                  onExecutePreview={handleSplitPreviewExecute}
+                  onClearPreview={clearSplitPreview}
+                  isExecuting={isSplitPreviewExecuting}
+                  hasDesignDoc={!!specMarkdown}
+                  hasCodeFiles={!!codeWithLineNumbers}
+                  codeFilenames={codeFiles.map(f => f.filename)}
+                />
+              </div>
+
               {/* Mapping policy */}
               <MappingPolicySection
                 currentPolicy={splitSettings.mappingPolicy}
@@ -493,21 +508,6 @@ export function Reviewer() {
                 isWarning={tokenEstimation.isWarning}
                 isVisible={!!(specMarkdown || codeWithLineNumbers)}
               />
-
-              {/* Split settings */}
-              <div className="mb-6">
-                <SplitSettingsSection
-                  settings={splitSettings}
-                  onSettingsChange={setSplitSettings}
-                  previewResult={splitPreviewResult}
-                  onExecutePreview={handleSplitPreviewExecute}
-                  onClearPreview={clearSplitPreview}
-                  isExecuting={isSplitPreviewExecuting}
-                  hasDesignDoc={!!specMarkdown}
-                  hasCodeFiles={!!codeWithLineNumbers}
-                  codeFilenames={codeFiles.map(f => f.filename)}
-                />
-              </div>
 
               {/* Mapping button */}
               <Card className="mb-6">
