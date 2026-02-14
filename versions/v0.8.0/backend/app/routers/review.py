@@ -197,38 +197,22 @@ async def structure_matching(request: StructureMatchingRequest):
         else:
             role = "設計書とソースコードの構造を分析する専門家"
 
-        # purposeの設定（systemPrompt.purposeを引用して構造マッチングの目的を説明）
-        purpose_base = request.systemPrompt.purpose if request.systemPrompt and request.systemPrompt.purpose else "設計書とコードの整合性を確認する"
-        
-        if request.mappingPolicy == "strict":
+        # purposeの設定（フロントエンドから送られたsystemPrompt.purposeをそのまま使用）
+        if request.systemPrompt and request.systemPrompt.purpose:
             purpose = (
-                f"最終的な目的: {purpose_base}\n\n"
-                "【重要】厳密モード: IDやシンボル名の一致を最優先してください。"
-                "設計書の「セクションID」やコードの「型/名前」を厳密にマッチングさせ、"
-                "推測によるマッピングを最小限に抑えてください。"
-            )
-        elif request.mappingPolicy == "detailed":
-            purpose = (
-                f"最終的な目的: {purpose_base}\n\n"
-                "【重要】詳細モード: 構造だけでなく、提供されたMAP情報の概要テキストも参照して、"
-                "意味的に関連の深いセクションとシンボルを網羅的にグループ化してください。"
+                "最終的な目的:\n"
+                "```\n"
+                f"{request.systemPrompt.purpose}\n"
+                "```\n\n"
+                "この目的を達成するため、まず設計書の構造（セクション一覧）と"
+                "コードの構造（シンボル一覧）を比較し、"
+                "関連性の高い設計書セクションとコードシンボルをグループにまとめてください。"
             )
         else:
-            if request.systemPrompt and request.systemPrompt.purpose:
-                purpose = (
-                    "最終的な目的:\n"
-                    "```\n"
-                    f"{request.systemPrompt.purpose}\n"
-                    "```\n\n"
-                    "この目的を達成するため、まず設計書の構造（セクション一覧）と"
-                    "コードの構造（シンボル一覧）を比較し、"
-                    "関連性の高い設計書セクションとコードシンボルをグループにまとめてください。"
-                )
-            else:
-                purpose = (
-                    "設計書の構造（セクション一覧）とコードの構造（シンボル一覧）を比較し、"
-                    "関連性の高い設計書セクションとコードシンボルをグループにまとめる"
-                )
+            purpose = (
+                "設計書の構造（セクション一覧）とコードの構造（シンボル一覧）を比較し、"
+                "関連性の高い設計書セクションとコードシンボルをグループにまとめる"
+            )
 
         output_format = """以下のJSON形式で出力してください:
 

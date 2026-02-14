@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import type { SystemPromptPreset } from '../../types'
 
 interface SystemPromptEditorProps {
   currentValues: {

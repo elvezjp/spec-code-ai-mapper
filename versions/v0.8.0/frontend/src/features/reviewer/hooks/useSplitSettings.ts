@@ -6,7 +6,6 @@ import type {
   CodePart,
 } from '../types'
 import * as api from '../services/api'
-import { useSharedState } from '@/core/contexts/SharedStateContext'
 
 interface UseSplitSettingsReturn {
   // State
@@ -23,25 +22,16 @@ interface UseSplitSettingsReturn {
     codeFiles: Array<{ filename: string; content: string }>
   ) => Promise<void>
   clearPreview: () => void
-
-  // Computed
-  isSplitEnabled: boolean
-  reviewMode: 'batch' | 'document-split' | 'code-split' | 'both-split'
-  estimatedReviewCount: number
 }
 
 const DEFAULT_SETTINGS: SplitSettings = {
-  documentMode: 'batch',
   documentMaxDepth: 2,
-  codeMode: 'batch',
   mappingPolicy: 'standard',
 }
 
 export function useSplitSettings(): UseSplitSettingsReturn {
-  const {
-    splitSettings: settings, setSplitSettings: setSettings,
-    splitPreviewResult: previewResult, setSplitPreviewResult: setPreviewResult
-  } = useSharedState()
+  const [settings, setSettings] = useState<SplitSettings>(DEFAULT_SETTINGS)
+  const [previewResult, setPreviewResult] = useState<SplitPreviewResult | null>(null)
 
   const [isExecutingPreview, setIsExecutingPreview] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -62,7 +52,7 @@ export function useSplitSettings(): UseSplitSettingsReturn {
       let codeLanguage: string | null = null
 
       // 設計書分割
-      if (settings.documentMode === 'split' && designMarkdown) {
+      if (designMarkdown) {
         const response = await api.splitMarkdown({
           content: designMarkdown,
           filename: designFilename,
@@ -78,7 +68,7 @@ export function useSplitSettings(): UseSplitSettingsReturn {
       }
 
       // コード分割（対応言語のファイルのみ）
-      if (settings.codeMode === 'split' && codeFiles.length > 0) {
+      if (codeFiles.length > 0) {
         const allCodeParts: CodePart[] = []
         const allIndexContents: string[] = []
 
@@ -126,7 +116,7 @@ export function useSplitSettings(): UseSplitSettingsReturn {
     } finally {
       setIsExecutingPreview(false)
     }
-  }, [settings.documentMode, settings.codeMode, settings.documentMaxDepth])
+  }, [settings.documentMaxDepth])
 
   const clearPreview = useCallback(() => {
     setPreviewResult(null)
@@ -140,43 +130,6 @@ export function useSplitSettings(): UseSplitSettingsReturn {
     setError(null)
   }, [])
 
-  // Computed values
-  const isSplitEnabled = settings.documentMode === 'split' || settings.codeMode === 'split'
-
-  const reviewMode = (() => {
-    if (settings.documentMode === 'split' && settings.codeMode === 'split') {
-      return 'both-split' as const
-    }
-    if (settings.documentMode === 'split') {
-      return 'document-split' as const
-    }
-    if (settings.codeMode === 'split') {
-      return 'code-split' as const
-    }
-    return 'batch' as const
-  })()
-
-  // レビュー回数の推定
-  const estimatedReviewCount = (() => {
-    if (!previewResult) return 1
-
-    const docCount = previewResult.documentParts?.length || 0
-    const codeCount = previewResult.codeParts?.length || 0
-
-    switch (reviewMode) {
-      case 'both-split':
-        // フェーズ1: 構造マッチング 1回
-        // フェーズ2: ペアレビュー（最大 docCount + codeCount、実際は関連ペアのみ）
-        return 1 + docCount + codeCount
-      case 'document-split':
-        return docCount
-      case 'code-split':
-        return codeCount
-      default:
-        return 1
-    }
-  })()
-
   return {
     settings,
     previewResult,
@@ -185,8 +138,5 @@ export function useSplitSettings(): UseSplitSettingsReturn {
     setSettings: handleSetSettings,
     executePreview,
     clearPreview,
-    isSplitEnabled,
-    reviewMode,
-    estimatedReviewCount,
   }
 }

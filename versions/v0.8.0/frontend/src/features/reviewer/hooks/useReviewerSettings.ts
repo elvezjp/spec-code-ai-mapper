@@ -6,7 +6,6 @@ import {
   DEFAULT_SYSTEM_PROMPTS,
   DEFAULT_LLM_SETTINGS,
 } from '@core/hooks/useSettings'
-import { useSharedState } from '@/core/contexts/SharedStateContext'
 
 export interface ConfigLoadStatus {
   llm?: string
@@ -28,6 +27,7 @@ interface UseReviewerSettingsReturn {
   // System prompts
   currentPromptValues: SystemPromptValues
   updatePromptValue: (field: keyof SystemPromptValues, value: string) => void
+  applyMappingPolicy: (policy: string) => void
 
   // Config file
   reviewerConfig: ReviewerConfig | null
@@ -38,6 +38,18 @@ interface UseReviewerSettingsReturn {
   saveConfigToBrowser: () => void
   clearSavedConfig: () => void
   hasSavedConfig: () => boolean
+}
+
+// マッピングポリシーに応じたpurposeテンプレート
+const MAPPING_POLICY_PURPOSES: Record<string, string> = {
+  standard: '設計書の記述とソースコードの実装が一致しているか、漏れや誤りがないかを確認する',
+  strict: '設計書の記述とソースコードの実装が一致しているか、漏れや誤りがないかを確認する\n\n'
+    + '【重要】厳密モード: IDやシンボル名の一致を最優先してください。'
+    + '設計書の「セクションID」やコードの「型/名前」を厳密にマッチングさせ、'
+    + '推測によるマッピングを最小限に抑えてください。',
+  detailed: '設計書の記述とソースコードの実装が一致しているか、漏れや誤りがないかを確認する\n\n'
+    + '【重要】詳細モード: 構造だけでなく、提供されたMAP情報の概要テキストも参照して、'
+    + '意味的に関連の深いセクションとシンボルを網羅的にグループ化してください。',
 }
 
 const STORAGE_KEY = 'reviewer-config'
@@ -55,10 +67,15 @@ const parseSelectedModelKey = (key: string): { provider: string; model: string }
 }
 
 export function useReviewerSettings(): UseReviewerSettingsReturn {
-  const {
-    llmConfig: sharedLlmConfig, setLlmConfig,
-    currentPromptValues, setCurrentPromptValues
-  } = useSharedState()
+  const [currentPromptValues, setCurrentPromptValues] = useState<SystemPromptValues>(() => {
+    const defaultPrompt = DEFAULT_SYSTEM_PROMPTS[0]
+    return {
+      role: defaultPrompt?.role ?? '',
+      purpose: defaultPrompt?.purpose ?? '',
+      format: defaultPrompt?.format ?? '',
+      notes: defaultPrompt?.notes ?? '',
+    }
+  })
 
   const [reviewerConfig, setReviewerConfig] = useState<ReviewerConfig | null>(null)
   const [configFilename, setConfigFilename] = useState<string | null>(null)
@@ -86,7 +103,7 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
   }, [reviewerConfig])
 
   const llmConfig = useMemo((): LlmConfig | null => {
-    if (!reviewerConfig?.llm?.provider) return sharedLlmConfig
+    if (!reviewerConfig?.llm?.provider) return null
 
     const config = {
       provider: reviewerConfig.llm.provider as LlmConfig['provider'],
@@ -98,14 +115,7 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
       region: reviewerConfig.llm.region,
     }
     return config
-  }, [reviewerConfig, selectedModel, sharedLlmConfig])
-
-  // llmConfig が変わったら共有状態に反映
-  useEffect(() => {
-    if (llmConfig) {
-      setLlmConfig(llmConfig)
-    }
-  }, [llmConfig, setLlmConfig])
+  }, [reviewerConfig, selectedModel])
 
   // モデル選択変更時にlocalStorageにも保存
   const setSelectedModel = useCallback(
@@ -142,6 +152,13 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
       ...prev,
       [field]: value,
     }))
+  }, [setCurrentPromptValues])
+
+  const applyMappingPolicy = useCallback((policy: string) => {
+    const purpose = MAPPING_POLICY_PURPOSES[policy]
+    if (purpose) {
+      setCurrentPromptValues((prev) => ({ ...prev, purpose }))
+    }
   }, [setCurrentPromptValues])
 
   const parseReviewerConfig = (content: string): ReviewerConfig => {
@@ -464,6 +481,7 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
     getSpecTypesList,
     currentPromptValues,
     updatePromptValue,
+    applyMappingPolicy,
     reviewerConfig,
     configFilename,
     configModified,

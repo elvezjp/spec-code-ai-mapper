@@ -4,7 +4,7 @@ import { Modal } from '../../ui/Modal'
 import { ProgramInfoSection } from './ProgramInfoSection'
 import { ConfigFileSection } from './ConfigFileSection'
 import { LlmSettingsSection, type TestConnectionResult } from './LlmSettingsSection'
-import type { AppInfo, LlmSettings, SystemPromptPreset } from '../../../types'
+import type { AppInfo, LlmSettings } from '../../../types'
 
 interface SettingsModalSections {
   programInfo?: boolean

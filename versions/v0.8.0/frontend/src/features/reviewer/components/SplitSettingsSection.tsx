@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@core/index'
-import type { SplitSettings, SplitMode, DocumentPart, CodePart, SplitPreviewResult } from '../types'
+import type { SplitSettings, DocumentPart, CodePart, SplitPreviewResult } from '../types'
 
 interface SplitSettingsSectionProps {
   settings: SplitSettings
@@ -13,6 +13,7 @@ interface SplitSettingsSectionProps {
   hasDesignDoc: boolean
   hasCodeFiles: boolean
   codeFilenames: string[]
+  onMappingPolicyChange?: (policy: string) => void
 }
 
 export function SplitSettingsSection({
@@ -25,6 +26,7 @@ export function SplitSettingsSection({
   hasDesignDoc,
   hasCodeFiles,
   codeFilenames,
+  onMappingPolicyChange,
 }: SplitSettingsSectionProps) {
   const [isOptionsExpanded, setIsOptionsExpanded] = useState(true)
   const prevHasDesignDocRef = useRef(hasDesignDoc)
@@ -47,33 +49,16 @@ export function SplitSettingsSection({
     prevHasCodeFilesRef.current = hasCodeFiles
   }, [hasDesignDoc, hasCodeFiles, previewResult, onClearPreview])
 
-  const handleDocModeChange = useCallback((mode: SplitMode) => {
-    onSettingsChange({ ...settings, documentMode: mode })
-    if (mode === 'split') {
-      setIsOptionsExpanded(true)
-    }
-  }, [settings, onSettingsChange])
-
-  const handleCodeModeChange = useCallback((mode: SplitMode) => {
-    onSettingsChange({ ...settings, codeMode: mode })
-    if (mode === 'split') {
-      setIsOptionsExpanded(true)
-    }
-  }, [settings, onSettingsChange])
-
   const handleMappingPolicyChange = useCallback((policy: string) => {
     onSettingsChange({ ...settings, mappingPolicy: policy })
-  }, [settings, onSettingsChange])
+    onMappingPolicyChange?.(policy)
+  }, [settings, onSettingsChange, onMappingPolicyChange])
 
   const handleDepthChange = useCallback((depth: number) => {
     onSettingsChange({ ...settings, documentMaxDepth: depth })
   }, [settings, onSettingsChange])
 
-  const isSplitEnabled = settings.documentMode === 'split' || settings.codeMode === 'split'
-  const canExecutePreview = isSplitEnabled && (
-    (settings.documentMode === 'split' && hasDesignDoc) ||
-    (settings.codeMode === 'split' && hasCodeFiles)
-  )
+  const canExecutePreview = hasDesignDoc || hasCodeFiles
 
   // 対応言語を判定
   const supportedCodeFiles = codeFilenames.filter(name => {
@@ -89,80 +74,11 @@ export function SplitSettingsSection({
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-lg font-semibold text-gray-800">分割設定</h2>
       <p className="text-xs text-gray-400 mt-2 mb-4">
-        設計書やプログラムが大きくAIのトークン上限を超える場合、分割してレビューできます。
+        設計書とプログラムを分割してマッピングします。
       </p>
 
-      {/* 分割モード選択 */}
+      {/* マッピング方式 */}
       <div className="space-y-2 mb-4">
-        {/* 設計書 */}
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-gray-700 w-24">設計書:</span>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="docMode"
-              checked={settings.documentMode === 'batch'}
-              onChange={() => handleDocModeChange('batch')}
-              className="w-4 h-4 text-blue-600"
-              disabled={!hasDesignDoc}
-            />
-            <span className="text-sm text-gray-700">一括</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="docMode"
-              checked={settings.documentMode === 'split'}
-              onChange={() => handleDocModeChange('split')}
-              className="w-4 h-4 text-blue-600"
-              disabled={!hasDesignDoc}
-            />
-            <span className="text-sm text-gray-700">分割</span>
-          </label>
-          <span className="text-xs text-gray-400 ml-2">
-            ※{' '}
-            <a href="https://github.com/elvezjp/md2map" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-              md2map
-            </a>
-            {' '}の仕様に準拠し、設定した見出しレベルで分割します。
-          </span>
-        </div>
-
-        {/* プログラム */}
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-gray-700 w-24">プログラム:</span>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="codeMode"
-              checked={settings.codeMode === 'batch'}
-              onChange={() => handleCodeModeChange('batch')}
-              className="w-4 h-4 text-blue-600"
-              disabled={!hasCodeFiles}
-            />
-            <span className="text-sm text-gray-700">一括</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="codeMode"
-              checked={settings.codeMode === 'split'}
-              onChange={() => handleCodeModeChange('split')}
-              className="w-4 h-4 text-blue-600"
-              disabled={!hasCodeFiles}
-            />
-            <span className="text-sm text-gray-700">分割</span>
-          </label>
-          <span className="text-xs text-gray-400 ml-2">
-            ※{' '}
-            <a href="https://github.com/elvezjp/code2map" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-              code2map
-            </a>
-            {' '}の仕様に準拠し、クラスや関数など意味のある単位で分割します。
-          </span>
-        </div>
-
-        {/* マッピング方式 (v0.8.0 - New) */}
         <div className="flex items-start gap-4 pt-2">
           <span className="text-sm font-medium text-gray-700 w-24 mt-1">マッピング方式:</span>
           <div className="flex flex-col gap-2">
@@ -208,103 +124,113 @@ export function SplitSettingsSection({
       </div>
 
       {/* 分割オプション */}
-      {isSplitEnabled && (
-        <div className="mb-4">
-          <button
-            type="button"
-            onClick={() => setIsOptionsExpanded(!isOptionsExpanded)}
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
-          >
-            {isOptionsExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            分割オプション
-          </button>
-          {isOptionsExpanded && (
-            <div className="mt-2 p-3 bg-gray-50 rounded border border-gray-200 space-y-3">
-              {/* 設計書オプション */}
-              {settings.documentMode === 'split' && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">設計書</p>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-600">見出しレベル:</span>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="docDepth"
-                        checked={settings.documentMaxDepth === 2}
-                        onChange={() => handleDepthChange(2)}
-                        className="w-4 h-4 text-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">H2(##)まで（推奨）</span>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="docDepth"
-                        checked={settings.documentMaxDepth === 3}
-                        onChange={() => handleDepthChange(3)}
-                        className="w-4 h-4 text-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">H3(###)まで</span>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="docDepth"
-                        checked={settings.documentMaxDepth === 4}
-                        onChange={() => handleDepthChange(4)}
-                        className="w-4 h-4 text-blue-600"
-                      />
-                      <span className="text-sm text-gray-700">H4(####)まで</span>
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              {/* プログラムオプション */}
-              {settings.codeMode === 'split' && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">プログラム</p>
-                  <div className="text-sm text-gray-600">
-                    <p>対応言語: Python (.py) / Java (.java)</p>
-                    {supportedCodeFiles.length > 0 && (
-                      <p className="mt-1 text-green-600">
-                        対応ファイル: {supportedCodeFiles.join(', ')}
-                      </p>
-                    )}
-                    {unsupportedCodeFiles.length > 0 && (
-                      <p className="mt-1 text-amber-600">
-                        未対応ファイル: {unsupportedCodeFiles.join(', ')}（一括処理されます）
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={() => setIsOptionsExpanded(!isOptionsExpanded)}
+          className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
+        >
+          {isOptionsExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          分割オプション
+        </button>
+        {isOptionsExpanded && (
+          <div className="mt-2 p-3 bg-gray-50 rounded border border-gray-200 space-y-3">
+            {/* 設計書オプション */}
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                設計書
+                <span className="text-xs text-gray-400 ml-2">
+                  ※{' '}
+                  <a href="https://github.com/elvezjp/md2map" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                    md2map
+                  </a>
+                  {' '}の仕様に準拠し、設定した見出しレベルで分割します。
+                </span>
+              </p>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600">見出しレベル:</span>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="docDepth"
+                    checked={settings.documentMaxDepth === 2}
+                    onChange={() => handleDepthChange(2)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">H2(##)まで（推奨）</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="docDepth"
+                    checked={settings.documentMaxDepth === 3}
+                    onChange={() => handleDepthChange(3)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">H3(###)まで</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="docDepth"
+                    checked={settings.documentMaxDepth === 4}
+                    onChange={() => handleDepthChange(4)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">H4(####)まで</span>
+                </label>
+              </div>
             </div>
-          )}
-        </div>
-      )}
+
+            {/* プログラムオプション */}
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                プログラム
+                <span className="text-xs text-gray-400 ml-2">
+                  ※{' '}
+                  <a href="https://github.com/elvezjp/code2map" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                    code2map
+                  </a>
+                  {' '}の仕様に準拠し、クラスや関数など意味のある単位で分割します。
+                </span>
+              </p>
+              <div className="text-sm text-gray-600">
+                <p>対応言語: Python (.py) / Java (.java)</p>
+                {supportedCodeFiles.length > 0 && (
+                  <p className="mt-1 text-green-600">
+                    対応ファイル: {supportedCodeFiles.join(', ')}
+                  </p>
+                )}
+                {unsupportedCodeFiles.length > 0 && (
+                  <p className="mt-1 text-amber-600">
+                    未対応ファイル: {unsupportedCodeFiles.join(', ')}（一括処理されます）
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 分割プレビュー実行ボタン */}
-      {isSplitEnabled && (
-        <div className="mb-4">
-          <button
-            onClick={onExecutePreview}
-            disabled={!canExecutePreview || isExecuting || !!previewResult}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            {isExecuting ? (
-              <>
-                <Loader2 className="w-4 h-4 inline mr-1 animate-spin" />
-                プレビュー実行中...
-              </>
-            ) : previewResult ? (
-              'プレビュー実行済み'
-            ) : (
-              '分割プレビュー実行'
-            )}
-          </button>
-        </div>
-      )}
+      <div className="mb-4">
+        <button
+          onClick={onExecutePreview}
+          disabled={!canExecutePreview || isExecuting || !!previewResult}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {isExecuting ? (
+            <>
+              <Loader2 className="w-4 h-4 inline mr-1 animate-spin" />
+              プレビュー実行中...
+            </>
+          ) : previewResult ? (
+            'プレビュー実行済み'
+          ) : (
+            '分割プレビュー実行'
+          )}
+        </button>
+      </div>
 
       {/* プレビュー結果 */}
       {previewResult && (

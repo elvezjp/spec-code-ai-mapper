@@ -2,8 +2,6 @@
 
 import type {
   ConversionTool,
-  ReviewRequest,
-  ReviewResult,
   OrganizeMarkdownRequest,
   OrganizeMarkdownResponse,
   SplitMarkdownRequest,
@@ -12,10 +10,6 @@ import type {
   SplitCodeResponse,
   StructureMatchingRequest,
   StructureMatchingResponse,
-  GroupReviewRequest,
-  GroupReviewResponse,
-  IntegrateRequest,
-  IntegrateResponse,
 } from '../types'
 
 const getBackendUrl = (): string => {
@@ -61,18 +55,6 @@ export async function addLineNumbers(
   const response = await fetch(`${getBackendUrl()}/api/convert/add-line-numbers`, {
     method: 'POST',
     body: formData,
-  })
-
-  return await response.json()
-}
-
-export async function executeReview(
-  request: ReviewRequest
-): Promise<{ success: boolean; report?: string; reviewMeta?: ReviewResult['reviewMeta']; error?: string }> {
-  const response = await fetch(`${getBackendUrl()}/api/review`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
   })
 
   return await response.json()
@@ -147,37 +129,13 @@ export async function splitCode(
 }
 
 // =============================================================================
-// Split Review APIs (v0.8.0 - New)
+// Structure Matching API (v0.8.0)
 // =============================================================================
 
 export async function executeStructureMatching(
   request: StructureMatchingRequest
 ): Promise<StructureMatchingResponse> {
   const response = await fetch(`${getBackendUrl()}/api/review/structure-matching`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  })
-
-  return await response.json()
-}
-
-export async function executeGroupReview(
-  request: GroupReviewRequest
-): Promise<GroupReviewResponse> {
-  const response = await fetch(`${getBackendUrl()}/api/review/group`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  })
-
-  return await response.json()
-}
-
-export async function executeIntegrate(
-  request: IntegrateRequest
-): Promise<IntegrateResponse> {
-  const response = await fetch(`${getBackendUrl()}/api/review/integrate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),

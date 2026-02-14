@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { DesignFile, CodeFile, ConversionTool } from '../types'
 import * as api from '../services/api'
-import { useSharedState } from '@/core/contexts/SharedStateContext'
 
 interface UseFileConversionReturn {
   // Design files
@@ -41,12 +40,10 @@ const DEFAULT_TOOL = 'markitdown'
 const DEFAULT_TYPE = '設計書'
 
 export function useFileConversion(): UseFileConversionReturn {
-  const {
-    specFiles, setSpecFiles,
-    specMarkdown, setSpecMarkdown,
-    codeFiles, setCodeFiles,
-    codeWithLineNumbers, setCodeWithLineNumbers
-  } = useSharedState()
+  const [specFiles, setSpecFiles] = useState<DesignFile[]>([])
+  const [specMarkdown, setSpecMarkdown] = useState<string | null>(null)
+  const [codeFiles, setCodeFiles] = useState<CodeFile[]>([])
+  const [codeWithLineNumbers, setCodeWithLineNumbers] = useState<string | null>(null)
 
   const [isSpecConverting, setIsSpecConverting] = useState(false)
   const [specStatus, setSpecStatus] = useState('')

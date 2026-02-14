@@ -6,7 +6,6 @@ import { useZipExport } from '@features/reviewer/hooks/useZipExport'
 const mockCreateObjectURL = vi.fn(() => 'blob:mock-url')
 const mockRevokeObjectURL = vi.fn()
 const mockClick = vi.fn()
-const mockClipboardWriteText = vi.fn()
 
 // 元のcreateElementを保存
 const originalCreateElement = document.createElement.bind(document)
@@ -32,13 +31,6 @@ beforeEach(() => {
     // それ以外は元の実装を使用
     return originalCreateElement(tagName)
   })
-
-  // navigator.clipboardのモック
-  Object.defineProperty(navigator, 'clipboard', {
-    value: { writeText: mockClipboardWriteText },
-    writable: true,
-    configurable: true,
-  })
 })
 
 afterEach(() => {
@@ -46,28 +38,6 @@ afterEach(() => {
 })
 
 describe('useZipExport', () => {
-  describe('downloadReport', () => {
-    it('レポートをマークダウンファイルとしてダウンロードできる', () => {
-      const { result } = renderHook(() => useZipExport())
-
-      result.current.downloadReport('# Review Result', 1)
-
-      expect(mockCreateObjectURL).toHaveBeenCalledWith(expect.any(Blob))
-      expect(mockClick).toHaveBeenCalled()
-      expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
-    })
-  })
-
-  describe('copyReport', () => {
-    it('レポートをクリップボードにコピーできる', async () => {
-      const { result } = renderHook(() => useZipExport())
-
-      await result.current.copyReport('# Review Result')
-
-      expect(mockClipboardWriteText).toHaveBeenCalledWith('# Review Result')
-    })
-  })
-
   describe('downloadSpecMarkdown', () => {
     it('設計書マークダウンをダウンロードできる', () => {
       const { result } = renderHook(() => useZipExport())
