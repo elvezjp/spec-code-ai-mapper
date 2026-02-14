@@ -28,13 +28,36 @@ AI Mapper is a tool that automatically maps sections of design documents (Markdo
   - Splits large files into meaningful units (e.g., chapters or functions) for precise mapping within LLM token limits.
 - **AI Review**: Automatically checks for inconsistencies between design and implementation based on mapping results.
 
-### High-Precision Mapping via Structure Matching ([Details](docs/split-review.md))
+## High-Precision Mapping via Structure Matching
 
 Instead of simple line-based splitting, it analyzes the chapter structure of design documents and the AST (Abstract Syntax Tree) of code to split and match them accurately.
 
-1. **Structure Extraction**: `md2map` and `code2map` create metadata (INDEX) for each.
-2. **AI Matching**: AI analyzes the INDEX to identify optimal many-to-many mappings.
-3. **Detailed Analysis**: AI compares and verifies the actual content of the mapped sections.
+1. **Structure Extraction**: `md2map` and `code2map` create metadata (INDEX / MAP) for each.
+2. **AI Matching**: AI analyzes INDEX and MAP to identify optimal many-to-many mappings.
+3. **Result Output**: Displays mapping results and reasoning as a Traceability Matrix.
+
+### Mapping Methods
+
+Three mapping methods are available depending on your needs. The system prompt sent to the AI changes based on the selected method.
+
+| Method | Description |
+|--------|-------------|
+| **Standard (LLM)** | LLM analyzes context and flexibly associates sections with code. |
+| **Strict (ID-based)** | Prioritizes matching by ID and symbol name. Suitable when traceability is well-defined. |
+| **Detailed (Content-aware)** | Increases accuracy by partially referencing section content (increases token consumption). |
+
+### Output Format
+
+Mapping results are output as a **group-based** Traceability Matrix, where related design sections and code symbols are grouped together. A single group may contain multiple design sections and multiple code symbols.
+
+| Field | Description |
+|-------|-------------|
+| **Group ID** | Group identifier (group1, group2, ...) |
+| **Specification Section** | Section IDs and titles belonging to the group |
+| **Associated Code** | Filenames and symbol names belonging to the group |
+| **Reason** | AI-generated rationale for the grouping |
+
+Results can be exported in Markdown format.
 
 ## Usage
 
