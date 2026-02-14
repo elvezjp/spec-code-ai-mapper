@@ -179,3 +179,19 @@ export interface StructureMatchingResponse {
   tokensUsed?: { input: number; output: number }
   error?: string
 }
+
+// =============================================================================
+// Mapping Execution Meta
+// =============================================================================
+
+export interface MappingExecutionMeta {
+  version: string
+  modelId: string
+  executedAt: string
+  inputTokens?: number
+  outputTokens?: number
+  designs: { filename: string; role?: string; type?: string; tool?: string }[]
+  programs: { filename: string }[]
+  mappingPolicy: string
+  totalGroups: number
+}

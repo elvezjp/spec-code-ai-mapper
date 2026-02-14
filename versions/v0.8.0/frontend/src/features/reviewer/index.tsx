@@ -1,22 +1,18 @@
 import { useEffect, useMemo, useCallback, useState, useRef } from 'react'
-import { Settings, FileText, Layers, Download, RefreshCw } from 'lucide-react'
+import { Settings, FileText } from 'lucide-react'
 import {
   Layout,
   Header,
   Card,
   Button,
   FileInputButton,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableHeaderCell,
-  TableCell,
+  ScreenContainer,
   SettingsModal,
   TokenEstimator,
   SystemPromptEditor,
   VersionSelector,
   useModal,
+  useScreenManager,
   useTokenEstimation,
   useVersions,
 } from '@core/index'
@@ -26,10 +22,12 @@ import {
   CodeFileList,
   MarkdownOrganizer,
   SplitSettingsSection,
+  MappingExecutingScreen,
+  MappingResult,
 } from './components'
 import { useFileConversion, useReviewerSettings, useZipExport, useSplitSettings } from './hooks'
 import { testLlmConnection, executeStructureMatching } from './services/api'
-import type { MatchedGroup } from './types'
+import type { MatchedGroup, MappingExecutionMeta } from './types'
 
 const APP_INFO = {
   name: 'spec-code-ai-mapper',
@@ -42,6 +40,7 @@ const APP_INFO = {
 export function Reviewer() {
   const settingsModal = useModal()
   const { versions, currentVersion, switchVersion } = useVersions()
+  const { currentScreen, showMain, showExecuting, showResult } = useScreenManager()
   const [toastMessage, setToastMessage] = useState('')
   const toastTimerRef = useRef<number | null>(null)
 
@@ -90,7 +89,7 @@ export function Reviewer() {
   } = useReviewerSettings()
 
   // Zip export
-  const { downloadSpecMarkdown, downloadCodeWithLineNumbers } =
+  const { downloadSpecMarkdown, downloadCodeWithLineNumbers, downloadMappingZip } =
     useZipExport()
 
   // Split settings
@@ -107,6 +106,8 @@ export function Reviewer() {
   const [mappingResult, setMappingResult] = useState<MatchedGroup[] | null>(null)
   const [isMapping, setIsMapping] = useState(false)
   const [mappingError, setMappingError] = useState<string | null>(null)
+  const [mappingReportText, setMappingReportText] = useState('')
+  const [mappingMeta, setMappingMeta] = useState<MappingExecutionMeta | null>(null)
 
   // System prompt text for token estimation
   const systemPromptText = useMemo(() => {
@@ -169,6 +170,27 @@ export function Reviewer() {
     )
   }, [codeFiles, specMarkdown, specFiles, executeSplitPreview])
 
+  // Build report text from mapping result
+  const buildReportText = useCallback((groups: MatchedGroup[]) => {
+    let report = '# マッピング結果レポート\n\n'
+    report += `グループ数: ${groups.length}\n\n`
+
+    groups.forEach((group, index) => {
+      report += `## ${index + 1}. ${group.groupName} (${group.groupId})\n\n`
+      report += '### 設計書セクション\n'
+      group.docSections.forEach((ds) => {
+        report += `- ${ds.id}: ${ds.title} (${ds.path})\n`
+      })
+      report += '\n### コードシンボル\n'
+      group.codeSymbols.forEach((cs) => {
+        report += `- ${cs.filename} :: ${cs.symbol}\n`
+      })
+      report += `\n### 理由\n${group.reason}\n\n---\n\n`
+    })
+
+    return report
+  }, [])
+
   // Mapping execution
   const handleMapping = useCallback(async () => {
     if (!splitPreviewResult || !specMarkdown) {
@@ -178,6 +200,7 @@ export function Reviewer() {
 
     setIsMapping(true)
     setMappingError(null)
+    showExecuting()
 
     try {
       const documentIndexMd = splitPreviewResult.documentIndex || ''
@@ -218,39 +241,73 @@ export function Reviewer() {
       })
 
       if (response.success && response.groups) {
+        const executedAt = new Date().toISOString()
         setMappingResult(response.groups)
+        setMappingReportText(buildReportText(response.groups))
+        setMappingMeta({
+          version: APP_INFO.version,
+          modelId: llmConfig?.model || 'unknown',
+          executedAt,
+          inputTokens: response.tokensUsed?.input,
+          outputTokens: response.tokensUsed?.output,
+          designs: specFiles.map((f) => ({
+            filename: f.filename,
+            type: f.type,
+            tool: f.tool,
+          })),
+          programs: codeFiles.map((f) => ({ filename: f.filename })),
+          mappingPolicy: splitSettings.mappingPolicy,
+          totalGroups: response.totalGroups,
+        })
+        setIsMapping(false)
+        showResult()
       } else {
         setMappingError(response.error || 'マッピングに失敗しました。')
+        setIsMapping(false)
       }
     } catch (err) {
       setMappingError(err instanceof Error ? err.message : 'エラーが発生しました。')
-    } finally {
       setIsMapping(false)
     }
-  }, [splitPreviewResult, specMarkdown, codeFiles, currentPromptValues, llmConfig])
+  }, [splitPreviewResult, specMarkdown, codeFiles, specFiles, currentPromptValues, llmConfig, splitSettings.mappingPolicy, showExecuting, showResult, buildReportText])
 
-  // Markdown export
-  const handleExportMarkdown = useCallback(() => {
-    if (!mappingResult) return
-
-    let markdown = '# Traceability Matrix\n\n'
-    markdown += '| ID | Specification Section | Associated Code | Reason |\n'
-    markdown += '|---|---|---|---|\n'
-
-    mappingResult.forEach(group => {
-      const specSections = group.docSections.map(ds => `${ds.id}: ${ds.title}`).join('<br>')
-      const codeSymbols = group.codeSymbols.map(cs => `${cs.filename} (${cs.symbol})`).join('<br>')
-      markdown += `| ${group.groupId} | ${specSections} | ${codeSymbols} | ${group.reason} |\n`
+  // Result screen handlers
+  const handleCopyReport = useCallback((text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('レポートをクリップボードにコピーしました')
     })
+  }, [showToast])
 
-    const blob = new Blob([markdown], { type: 'text/markdown' })
+  const handleDownloadReport = useCallback((text: string) => {
+    const blob = new Blob([text], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'traceability_matrix.md'
+    a.download = 'mapping-report.md'
     a.click()
     URL.revokeObjectURL(url)
-  }, [mappingResult])
+  }, [])
+
+  const handleDownloadZip = useCallback(() => {
+    if (!mappingResult || !mappingMeta || !specMarkdown || !codeWithLineNumbers) return
+    downloadMappingZip({
+      mappingResult,
+      executionMeta: mappingMeta,
+      reportText: mappingReportText,
+      systemPrompt: currentPromptValues,
+      specMarkdown,
+      codeWithLineNumbers,
+    })
+  }, [mappingResult, mappingMeta, mappingReportText, currentPromptValues, specMarkdown, codeWithLineNumbers, downloadMappingZip])
+
+  const handleBackFromExecuting = useCallback(() => {
+    setMappingError(null)
+    showMain()
+  }, [showMain])
+
+  const handleBackFromResult = useCallback(() => {
+    showMain()
+  }, [showMain])
 
   const handleConvertSpecs = () => {
     convertSpecs(getTypeNote)
@@ -305,229 +362,186 @@ export function Reviewer() {
         </div>
       )}
       <Layout>
-        {/* Header */}
-        <Header
-          title={APP_INFO.description}
-          leftContent={
-            <VersionSelector
-              versions={versions}
-              currentVersion={currentVersion}
-              onVersionSelect={switchVersion}
+        <ScreenContainer
+          currentScreen={currentScreen}
+          mainScreen={
+            <>
+              {/* Header */}
+              <Header
+                title={APP_INFO.description}
+                leftContent={
+                  <VersionSelector
+                    versions={versions}
+                    currentVersion={currentVersion}
+                    onVersionSelect={switchVersion}
+                  />
+                }
+                rightContent={
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={settingsModal.open}
+                      className="text-gray-500 hover:text-gray-700"
+                      title="設定"
+                    >
+                      <Settings className="w-6 h-6" />
+                    </button>
+                  </div>
+                }
+              />
+
+              {/* Spec files section */}
+              <Card className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">設計書 (Excel)</h2>
+                <div className="flex items-center gap-2 mb-2">
+                  <FileInputButton
+                    accept=".xlsx,.xls"
+                    multiple
+                    onFilesSelect={addSpecFiles}
+                    label="ファイルを選択"
+                  />
+                  <span className="text-gray-600 text-sm flex items-center gap-1">
+                    {specFiles.length > 0 ? (
+                      <>
+                        <FileText className="w-4 h-4" />
+                        {specFiles.map((f) => f.filename).join(', ')}
+                      </>
+                    ) : (
+                      '選択してください'
+                    )}
+                  </span>
+                </div>
+                <SpecFileList
+                  files={specFiles}
+                  availableTools={availableTools}
+                  specTypesList={getSpecTypesList()}
+                  specMarkdown={specMarkdown}
+                  specStatus={specStatus}
+                  isConverting={isSpecConverting}
+                  onMainChange={setMainSpec}
+                  onTypeChange={setSpecType}
+                  onToolChange={setSpecTool}
+                  onApplyToolToAll={applyToolToAll}
+                  onConvert={handleConvertSpecs}
+                  onDownload={() => specMarkdown && downloadSpecMarkdown(specMarkdown)}
+                />
+                <MarkdownOrganizer
+                  specMarkdown={specMarkdown}
+                  specFiles={specFiles}
+                  llmConfig={llmConfig || undefined}
+                  getTypeNote={getTypeNote}
+                  onAdopt={(organizedFiles) => applyOrganizedMarkdown(organizedFiles, getTypeNote)}
+                />
+              </Card>
+
+              {/* Code files section */}
+              <Card className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">プログラム</h2>
+                <div className="flex items-center gap-2 mb-2">
+                  <FileInputButton
+                    multiple
+                    onFilesSelect={addCodeFiles}
+                    label="ファイルを選択"
+                  />
+                  <span className="text-gray-600 text-sm flex items-center gap-1">
+                    {codeFiles.length > 0 ? (
+                      <>
+                        <FileText className="w-4 h-4" />
+                        {codeFiles.map((f) => f.filename).join(', ')}
+                      </>
+                    ) : (
+                      '選択してください'
+                    )}
+                  </span>
+                </div>
+                <CodeFileList
+                  files={codeFiles}
+                  codeWithLineNumbers={codeWithLineNumbers}
+                  codeStatus={codeStatus}
+                  isConverting={isCodeConverting}
+                  onConvert={convertCodes}
+                  onDownload={() => codeWithLineNumbers && downloadCodeWithLineNumbers(codeWithLineNumbers)}
+                />
+              </Card>
+
+              {/* System prompt settings */}
+              <SystemPromptEditor
+                currentValues={currentPromptValues}
+                onValueChange={updatePromptValue}
+                isCollapsible={true}
+                defaultExpanded={false}
+              />
+
+              {/* Token estimate */}
+              <TokenEstimator
+                totalTokens={tokenEstimation.totalTokens}
+                specTokens={tokenEstimation.specTokens}
+                codeTokens={tokenEstimation.codeTokens}
+                promptTokens={tokenEstimation.promptTokens}
+                isWarning={tokenEstimation.isWarning}
+                isVisible={!!(specMarkdown || codeWithLineNumbers)}
+              />
+
+              {/* Split settings */}
+              <div className="mb-6">
+                <SplitSettingsSection
+                  settings={splitSettings}
+                  onSettingsChange={setSplitSettings}
+                  previewResult={splitPreviewResult}
+                  onExecutePreview={handleSplitPreviewExecute}
+                  onClearPreview={clearSplitPreview}
+                  isExecuting={isSplitPreviewExecuting}
+                  hasDesignDoc={!!specMarkdown}
+                  hasCodeFiles={!!codeWithLineNumbers}
+                  codeFilenames={codeFiles.map(f => f.filename)}
+                  onMappingPolicyChange={applyMappingPolicy}
+                />
+              </div>
+
+              {/* Mapping button */}
+              <Card className="mb-6">
+                <Button
+                  variant="success"
+                  size="lg"
+                  disabled={!isReviewEnabled || !splitPreviewResult || isMapping}
+                  onClick={handleMapping}
+                >
+                  マッピング実行
+                </Button>
+                {!isReviewEnabled && (
+                  <p className="text-xs text-orange-500 mt-3 text-center">
+                    ※ マッピングを実行するには、設計書とプログラムを両方変換してください。
+                  </p>
+                )}
+                {isReviewEnabled && !splitPreviewResult && (
+                  <p className="text-xs text-orange-500 mt-3 text-center">
+                    ※ マッピングを実行するには、先に「分割プレビュー実行」を行ってください。
+                  </p>
+                )}
+              </Card>
+            </>
+          }
+          executingScreen={
+            <MappingExecutingScreen
+              isExecuting={isMapping}
+              error={mappingError}
+              onBack={handleBackFromExecuting}
+              onRetry={handleMapping}
             />
           }
-          rightContent={
-            <div className="flex items-center gap-3">
-              <button
-                onClick={settingsModal.open}
-                className="text-gray-500 hover:text-gray-700"
-                title="設定"
-              >
-                <Settings className="w-6 h-6" />
-              </button>
-            </div>
+          resultScreen={
+            mappingResult && mappingMeta ? (
+              <MappingResult
+                mappingResult={mappingResult}
+                executionMeta={mappingMeta}
+                reportText={mappingReportText}
+                onCopyReport={handleCopyReport}
+                onDownloadReport={handleDownloadReport}
+                onDownloadZip={handleDownloadZip}
+                onBack={handleBackFromResult}
+              />
+            ) : undefined
           }
         />
-
-        {/* Spec files section */}
-        <Card className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">設計書 (Excel)</h2>
-          <div className="flex items-center gap-2 mb-2">
-            <FileInputButton
-              accept=".xlsx,.xls"
-              multiple
-              onFilesSelect={addSpecFiles}
-              label="ファイルを選択"
-            />
-            <span className="text-gray-600 text-sm flex items-center gap-1">
-              {specFiles.length > 0 ? (
-                <>
-                  <FileText className="w-4 h-4" />
-                  {specFiles.map((f) => f.filename).join(', ')}
-                </>
-              ) : (
-                '選択してください'
-              )}
-            </span>
-          </div>
-          <SpecFileList
-            files={specFiles}
-            availableTools={availableTools}
-            specTypesList={getSpecTypesList()}
-            specMarkdown={specMarkdown}
-            specStatus={specStatus}
-            isConverting={isSpecConverting}
-            onMainChange={setMainSpec}
-            onTypeChange={setSpecType}
-            onToolChange={setSpecTool}
-            onApplyToolToAll={applyToolToAll}
-            onConvert={handleConvertSpecs}
-            onDownload={() => specMarkdown && downloadSpecMarkdown(specMarkdown)}
-          />
-          <MarkdownOrganizer
-            specMarkdown={specMarkdown}
-            specFiles={specFiles}
-            llmConfig={llmConfig || undefined}
-            getTypeNote={getTypeNote}
-            onAdopt={(organizedFiles) => applyOrganizedMarkdown(organizedFiles, getTypeNote)}
-          />
-        </Card>
-
-        {/* Code files section */}
-        <Card className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">プログラム</h2>
-          <div className="flex items-center gap-2 mb-2">
-            <FileInputButton
-              multiple
-              onFilesSelect={addCodeFiles}
-              label="ファイルを選択"
-            />
-            <span className="text-gray-600 text-sm flex items-center gap-1">
-              {codeFiles.length > 0 ? (
-                <>
-                  <FileText className="w-4 h-4" />
-                  {codeFiles.map((f) => f.filename).join(', ')}
-                </>
-              ) : (
-                '選択してください'
-              )}
-            </span>
-          </div>
-          <CodeFileList
-            files={codeFiles}
-            codeWithLineNumbers={codeWithLineNumbers}
-            codeStatus={codeStatus}
-            isConverting={isCodeConverting}
-            onConvert={convertCodes}
-            onDownload={() => codeWithLineNumbers && downloadCodeWithLineNumbers(codeWithLineNumbers)}
-          />
-        </Card>
-
-        {/* System prompt settings */}
-        <SystemPromptEditor
-          currentValues={currentPromptValues}
-          onValueChange={updatePromptValue}
-          isCollapsible={true}
-          defaultExpanded={false}
-        />
-
-        {/* Token estimate */}
-        <TokenEstimator
-          totalTokens={tokenEstimation.totalTokens}
-          specTokens={tokenEstimation.specTokens}
-          codeTokens={tokenEstimation.codeTokens}
-          promptTokens={tokenEstimation.promptTokens}
-          isWarning={tokenEstimation.isWarning}
-          isVisible={!!(specMarkdown || codeWithLineNumbers)}
-        />
-
-        {/* Split settings */}
-        <div className="mb-6">
-          <SplitSettingsSection
-            settings={splitSettings}
-            onSettingsChange={setSplitSettings}
-            previewResult={splitPreviewResult}
-            onExecutePreview={handleSplitPreviewExecute}
-            onClearPreview={clearSplitPreview}
-            isExecuting={isSplitPreviewExecuting}
-            hasDesignDoc={!!specMarkdown}
-            hasCodeFiles={!!codeWithLineNumbers}
-            codeFilenames={codeFiles.map(f => f.filename)}
-            onMappingPolicyChange={applyMappingPolicy}
-          />
-        </div>
-
-        {/* Mapping button */}
-        <Card className="mb-6">
-          <div className="flex justify-between items-center">
-            <Button
-              variant="success"
-              size="lg"
-              disabled={!isReviewEnabled || !splitPreviewResult || isMapping}
-              onClick={handleMapping}
-            >
-              {isMapping ? (
-                <>
-                  <RefreshCw className="w-4 h-4 inline mr-2 animate-spin" />
-                  マッピング実行中...
-                </>
-              ) : (
-                'マッピング実行'
-              )}
-            </Button>
-            {mappingResult && (
-              <Button
-                variant="success"
-                size="sm"
-                onClick={handleExportMarkdown}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Markdown出力
-              </Button>
-            )}
-          </div>
-          {!isReviewEnabled && (
-            <p className="text-xs text-orange-500 mt-3 text-center">
-              ※ マッピングを実行するには、設計書とプログラムを両方変換してください。
-            </p>
-          )}
-          {isReviewEnabled && !splitPreviewResult && (
-            <p className="text-xs text-orange-500 mt-3 text-center">
-              ※ マッピングを実行するには、先に「分割プレビュー実行」を行ってください。
-            </p>
-          )}
-        </Card>
-
-        {/* Mapping error */}
-        {mappingError && (
-          <Card className="mb-6 bg-red-50 border-red-200">
-            <p className="text-red-600 text-sm">{mappingError}</p>
-          </Card>
-        )}
-
-        {/* Traceability Matrix */}
-        {mappingResult && (
-          <Card className="mb-6">
-            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-              <Layers className="w-5 h-5 text-blue-500" />
-              Traceability Matrix
-            </h2>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell className="w-20">ID</TableHeaderCell>
-                  <TableHeaderCell>Specification Section</TableHeaderCell>
-                  <TableHeaderCell>Associated Code</TableHeaderCell>
-                  <TableHeaderCell>Reason</TableHeaderCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {mappingResult.map((group) => (
-                  <TableRow key={group.groupId}>
-                    <TableCell className="font-mono text-sm">{group.groupId}</TableCell>
-                    <TableCell>
-                      {group.docSections.map(ds => (
-                        <div key={ds.id} className="mb-1">
-                          <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs mr-2">{ds.id}</span>
-                          {ds.title}
-                        </div>
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {group.codeSymbols.map((cs, idx) => (
-                        <div key={`${cs.id}-${idx}`} className="mb-1 text-sm">
-                          <span className="text-gray-500">{cs.filename}</span>
-                          <span className="mx-1">::</span>
-                          <span className="font-medium text-blue-600">{cs.symbol}</span>
-                        </div>
-                      ))}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">{group.reason}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-        )}
 
         {/* Settings modal */}
         <SettingsModal
