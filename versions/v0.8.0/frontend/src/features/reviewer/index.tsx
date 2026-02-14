@@ -86,6 +86,8 @@ export function Reviewer() {
     saveConfigToBrowser,
     clearSavedConfig,
     hasSavedConfig,
+    getTypeNote,
+    getSpecTypesList,
   } = useReviewerSettings()
 
   // Review execution

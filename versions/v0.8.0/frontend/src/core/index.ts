@@ -19,7 +19,8 @@ export {
 } from './components/ui/Table'
 
 // Shared Components
-SettingsModal,
+export {
+  SettingsModal,
   ProgramInfoSection,
   ConfigFileSection,
   LlmSettingsSection,
