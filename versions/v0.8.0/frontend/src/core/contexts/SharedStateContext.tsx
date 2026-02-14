@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, type ReactNode } from 'react'
 import type {
     DesignFile,
     CodeFile,
@@ -8,7 +8,7 @@ import type {
     LlmConfig,
     SystemPromptValues
 } from '@/features/reviewer/types'
-import { DEFAULT_SYSTEM_PROMPTS, DEFAULT_LLM_SETTINGS } from '../hooks/useSettings'
+import { DEFAULT_SYSTEM_PROMPTS } from '../hooks/useSettings'
 
 interface SharedState {
     // Files
@@ -31,8 +31,8 @@ interface SharedState {
     setMappingResult: React.Dispatch<React.SetStateAction<MatchedGroup[] | null>>
 
     // Config
-    llmConfig: LlmConfig
-    setLlmConfig: React.Dispatch<React.SetStateAction<LlmConfig>>
+    llmConfig: LlmConfig | null
+    setLlmConfig: React.Dispatch<React.SetStateAction<LlmConfig | null>>
     currentPromptValues: SystemPromptValues
     setCurrentPromptValues: React.Dispatch<React.SetStateAction<SystemPromptValues>>
 }
@@ -49,12 +49,19 @@ export function SharedStateProvider({ children }: { children: ReactNode }) {
         documentMode: 'batch',
         documentMaxDepth: 2,
         codeMode: 'batch',
+        mappingPolicy: 'standard',
     })
     const [splitPreviewResult, setSplitPreviewResult] = useState<SplitPreviewResult | null>(null)
     const [mappingResult, setMappingResult] = useState<MatchedGroup[] | null>(null)
 
-    const [llmConfig, setLlmConfig] = useState<LlmConfig>(DEFAULT_LLM_SETTINGS)
-    const [currentPromptValues, setCurrentPromptValues] = useState<SystemPromptValues>(DEFAULT_SYSTEM_PROMPTS)
+    const defaultPrompt = DEFAULT_SYSTEM_PROMPTS[0]
+    const [llmConfig, setLlmConfig] = useState<LlmConfig | null>(null)
+    const [currentPromptValues, setCurrentPromptValues] = useState<SystemPromptValues>({
+        role: defaultPrompt?.role ?? '',
+        purpose: defaultPrompt?.purpose ?? '',
+        format: defaultPrompt?.format ?? '',
+        notes: defaultPrompt?.notes ?? '',
+    })
 
     return (
         <SharedStateContext.Provider
