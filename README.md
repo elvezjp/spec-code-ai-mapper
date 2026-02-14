@@ -28,7 +28,7 @@ AI Mapper is a tool that automatically maps sections of design documents (Markdo
   - Splits large files into meaningful units (e.g., chapters or functions) for precise mapping within LLM token limits.
 - **AI Review**: Automatically checks for inconsistencies between design and implementation based on mapping results.
 
-## High-Precision Mapping via Structure Matching
+## High-Precision Mapping via Structure Matching ([Details](docs/structure-matching.md))
 
 Instead of simple line-based splitting, it analyzes the chapter structure of design documents and the AST (Abstract Syntax Tree) of code to split and match them accurately.
 
