@@ -6,6 +6,7 @@ import {
   DEFAULT_SYSTEM_PROMPTS,
   DEFAULT_LLM_SETTINGS,
 } from '@core/hooks/useSettings'
+import { MAPPING_PRESET_CATALOG, DEFAULT_MAPPING_PRESET_ID } from '@core/data/mappingPresetCatalog'
 
 export interface ConfigLoadStatus {
   llm?: string
@@ -40,18 +41,6 @@ interface UseReviewerSettingsReturn {
   hasSavedConfig: () => boolean
 }
 
-// マッピングポリシーに応じたpurposeテンプレート
-const MAPPING_POLICY_PURPOSES: Record<string, string> = {
-  standard: '設計書の記述とソースコードの実装が一致しているか、漏れや誤りがないかを確認する',
-  strict: '設計書の記述とソースコードの実装が一致しているか、漏れや誤りがないかを確認する\n\n'
-    + '【重要】厳密モード: IDやシンボル名の一致を最優先してください。'
-    + '設計書の「セクションID」やコードの「型/名前」を厳密にマッチングさせ、'
-    + '推測によるマッピングを最小限に抑えてください。',
-  detailed: '設計書の記述とソースコードの実装が一致しているか、漏れや誤りがないかを確認する\n\n'
-    + '【重要】詳細モード: 構造だけでなく、提供されたMAP情報の概要テキストも参照して、'
-    + '意味的に関連の深いセクションとシンボルを網羅的にグループ化してください。',
-}
-
 const STORAGE_KEY = 'reviewer-config'
 const SELECTED_MODEL_KEY = 'selected-model'
 const SELECTED_PROMPT_KEY = 'selected-system-prompt'
@@ -68,6 +57,12 @@ const parseSelectedModelKey = (key: string): { provider: string; model: string }
 
 export function useReviewerSettings(): UseReviewerSettingsReturn {
   const [currentPromptValues, setCurrentPromptValues] = useState<SystemPromptValues>(() => {
+    const defaultMappingPreset = MAPPING_PRESET_CATALOG.find(
+      p => p.id === DEFAULT_MAPPING_PRESET_ID
+    )
+    if (defaultMappingPreset) {
+      return { ...defaultMappingPreset.systemPrompt }
+    }
     const defaultPrompt = DEFAULT_SYSTEM_PROMPTS[0]
     return {
       role: defaultPrompt?.role ?? '',
@@ -155,9 +150,9 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
   }, [setCurrentPromptValues])
 
   const applyMappingPolicy = useCallback((policy: string) => {
-    const purpose = MAPPING_POLICY_PURPOSES[policy]
-    if (purpose) {
-      setCurrentPromptValues((prev) => ({ ...prev, purpose }))
+    const preset = MAPPING_PRESET_CATALOG.find(p => p.id === policy)
+    if (preset) {
+      setCurrentPromptValues({ ...preset.systemPrompt })
     }
   }, [setCurrentPromptValues])
 

@@ -191,30 +191,29 @@ async def structure_matching(request: StructureMatchingRequest):
         provider = get_llm_provider(request.llmConfig)
 
         # システムプロンプト構築（prompt_builder使用）
-        # roleの設定（systemPrompt.roleがあれば使用）
+        # フロントエンドから送られた systemPrompt の4項目をそのまま使用
+        # 未指定の場合はデフォルト値にフォールバック
+
+        # role
         if request.systemPrompt and request.systemPrompt.role:
             role = request.systemPrompt.role
         else:
             role = "設計書とソースコードの構造を分析する専門家"
 
-        # purposeの設定（フロントエンドから送られたsystemPrompt.purposeをそのまま使用）
+        # purpose
         if request.systemPrompt and request.systemPrompt.purpose:
-            purpose = (
-                "最終的な目的:\n"
-                "```\n"
-                f"{request.systemPrompt.purpose}\n"
-                "```\n\n"
-                "この目的を達成するため、まず設計書の構造（セクション一覧）と"
-                "コードの構造（シンボル一覧）を比較し、"
-                "関連性の高い設計書セクションとコードシンボルをグループにまとめてください。"
-            )
+            purpose = request.systemPrompt.purpose
         else:
             purpose = (
                 "設計書の構造（セクション一覧）とコードの構造（シンボル一覧）を比較し、"
                 "関連性の高い設計書セクションとコードシンボルをグループにまとめる"
             )
 
-        output_format = """以下のJSON形式で出力してください:
+        # format
+        if request.systemPrompt and request.systemPrompt.format:
+            output_format = request.systemPrompt.format
+        else:
+            output_format = """以下のJSON形式で出力してください:
 
 ```json
 {
@@ -242,17 +241,19 @@ async def structure_matching(request: StructureMatchingRequest):
 }
 ```"""
 
-        # 注意事項の構築
-        notes_parts = [
-            "- 必ず指定されたJSON形式のみで応答してください",
-            "- 設計書の複数セクションと、複数のコード部分が、1つのグループに対応する場合もあります。",
-            "- 同じ設計書セクション、コード部分が、複数のグループに対応する場合もあります。",
-            "- 文字数の少ないセクション、コードシンボルは、情報が含まれていない可能性があります。他の部分と合わせてグループ化を検討してください。",
-            "- 【重要】出力するdoc_sectionsのidは、設計書MAP.jsonに記載されたid値を正確にそのまま使用してください（例: MD1, MD2, ...）",
-            "- 【重要】出力するcode_symbolsのidは、コードMAP.jsonに記載されたid値を正確にそのまま使用してください（例: CD1, CD2, ...）",
-        ]
-
-        notes = "\n".join(notes_parts)
+        # notes
+        if request.systemPrompt and request.systemPrompt.notes:
+            notes = request.systemPrompt.notes
+        else:
+            notes_parts = [
+                "- 必ず指定されたJSON形式のみで応答してください",
+                "- 設計書の複数セクションと、複数のコード部分が、1つのグループに対応する場合もあります。",
+                "- 同じ設計書セクション、コード部分が、複数のグループに対応する場合もあります。",
+                "- 文字数の少ないセクション、コードシンボルは、情報が含まれていない可能性があります。他の部分と合わせてグループ化を検討してください。",
+                "- 【重要】出力するdoc_sectionsのidは、設計書MAP.jsonに記載されたid値を正確にそのまま使用してください（例: MD1, MD2, ...）",
+                "- 【重要】出力するcode_symbolsのidは、コードMAP.jsonに記載されたid値を正確にそのまま使用してください（例: CD1, CD2, ...）",
+            ]
+            notes = "\n".join(notes_parts)
 
         system_prompt = build_system_prompt(role, purpose, output_format, notes)
 

@@ -22,6 +22,7 @@ import {
   CodeFileList,
   MarkdownOrganizer,
   SplitSettingsSection,
+  MappingPolicySection,
   MappingExecutingScreen,
   MappingResult,
 } from './components'
@@ -153,6 +154,12 @@ export function Reviewer() {
   }, [showToast])
 
   const isReviewEnabled = specMarkdown && codeWithLineNumbers
+
+  // Handler for mapping policy change
+  const handleMappingPolicyChange = useCallback((policy: string) => {
+    setSplitSettings({ ...splitSettings, mappingPolicy: policy })
+    applyMappingPolicy(policy)
+  }, [splitSettings, setSplitSettings, applyMappingPolicy])
 
   // Handler for split preview execution
   const handleSplitPreviewExecute = useCallback(async () => {
@@ -463,6 +470,12 @@ export function Reviewer() {
                 />
               </Card>
 
+              {/* Mapping policy */}
+              <MappingPolicySection
+                currentPolicy={splitSettings.mappingPolicy}
+                onPolicyChange={handleMappingPolicyChange}
+              />
+
               {/* System prompt settings */}
               <SystemPromptEditor
                 currentValues={currentPromptValues}
@@ -493,7 +506,6 @@ export function Reviewer() {
                   hasDesignDoc={!!specMarkdown}
                   hasCodeFiles={!!codeWithLineNumbers}
                   codeFilenames={codeFiles.map(f => f.filename)}
-                  onMappingPolicyChange={applyMappingPolicy}
                 />
               </div>
 

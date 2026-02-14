@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@core/index'
 import type { SplitSettings, DocumentPart, CodePart, SplitPreviewResult } from '../types'
@@ -13,7 +13,6 @@ interface SplitSettingsSectionProps {
   hasDesignDoc: boolean
   hasCodeFiles: boolean
   codeFilenames: string[]
-  onMappingPolicyChange?: (policy: string) => void
 }
 
 export function SplitSettingsSection({
@@ -26,7 +25,6 @@ export function SplitSettingsSection({
   hasDesignDoc,
   hasCodeFiles,
   codeFilenames,
-  onMappingPolicyChange,
 }: SplitSettingsSectionProps) {
   const [isOptionsExpanded, setIsOptionsExpanded] = useState(true)
   const prevHasDesignDocRef = useRef(hasDesignDoc)
@@ -48,11 +46,6 @@ export function SplitSettingsSection({
     prevHasDesignDocRef.current = hasDesignDoc
     prevHasCodeFilesRef.current = hasCodeFiles
   }, [hasDesignDoc, hasCodeFiles, previewResult, onClearPreview])
-
-  const handleMappingPolicyChange = useCallback((policy: string) => {
-    onSettingsChange({ ...settings, mappingPolicy: policy })
-    onMappingPolicyChange?.(policy)
-  }, [settings, onSettingsChange, onMappingPolicyChange])
 
   const handleDepthChange = useCallback((depth: number) => {
     onSettingsChange({ ...settings, documentMaxDepth: depth })
@@ -76,52 +69,6 @@ export function SplitSettingsSection({
       <p className="text-xs text-gray-400 mt-2 mb-4">
         設計書とプログラムを分割してマッピングします。
       </p>
-
-      {/* マッピング方式 */}
-      <div className="space-y-2 mb-4">
-        <div className="flex items-start gap-4 pt-2">
-          <span className="text-sm font-medium text-gray-700 w-24 mt-1">マッピング方式:</span>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="mappingPolicy"
-                  checked={settings.mappingPolicy === 'standard'}
-                  onChange={() => handleMappingPolicyChange('standard')}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <span className="text-sm text-gray-700">標準 (LLM)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="mappingPolicy"
-                  checked={settings.mappingPolicy === 'strict'}
-                  onChange={() => handleMappingPolicyChange('strict')}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <span className="text-sm text-gray-700">厳密 (ID重視)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="mappingPolicy"
-                  checked={settings.mappingPolicy === 'detailed'}
-                  onChange={() => handleMappingPolicyChange('detailed')}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <span className="text-sm text-gray-700">詳細 (内容参照)</span>
-              </label>
-            </div>
-            <p className="text-xs text-gray-400">
-              {settings.mappingPolicy === 'standard' && 'AIレビュアーの自動グループ化と同等の動作です。LLMが文脈を分析して柔軟に関連付けます。'}
-              {settings.mappingPolicy === 'strict' && 'IDやシンボル名の一致を優先します。トレーサビリティが明確な場合に適しています。'}
-              {settings.mappingPolicy === 'detailed' && 'セクションの内容も一部参照して精度を高めます（トークン消費量が増えます）。'}
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* 分割オプション */}
       <div className="mb-4">
