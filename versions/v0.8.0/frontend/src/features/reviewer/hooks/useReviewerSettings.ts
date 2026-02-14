@@ -421,26 +421,29 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
           setSelectedModelState(modelToSelect)
         }
 
+        // 保存されたプリセット名を復元
         const savedPreset = localStorage.getItem(SELECTED_PROMPT_KEY)
         if (savedPreset) {
-          const defaultPreset = DEFAULT_SYSTEM_PROMPTS[0]
+          // マッピングカタログ + 設定ファイルのプリセットから検索
+          const catalogPresets: SystemPromptPreset[] = MAPPING_PRESET_CATALOG.map((preset) => ({
+            name: preset.name,
+            role: preset.systemPrompt.role,
+            purpose: preset.systemPrompt.purpose,
+            format: preset.systemPrompt.format,
+            notes: preset.systemPrompt.notes,
+          }))
           const configPrompts = parsed.systemPrompts || []
-          const allPresets = [
-            ...(defaultPreset ? [defaultPreset] : []),
-            ...configPrompts,
-          ]
-          const exists = allPresets.some((p) => p.name === savedPreset)
-          if (exists) {
-            const preset = allPresets.find((p) => p.name === savedPreset)
-            if (preset) {
-              setCurrentPromptValues({
-                role: normalizePromptText(preset.role),
-                purpose: normalizePromptText(preset.purpose),
-                format: normalizePromptText(preset.format),
-                notes: normalizePromptText(preset.notes),
-              })
-            }
+          const allPresets = [...catalogPresets, ...configPrompts]
+          const preset = allPresets.find((p) => p.name === savedPreset)
+          if (preset) {
+            setCurrentPromptValues({
+              role: normalizePromptText(preset.role),
+              purpose: normalizePromptText(preset.purpose),
+              format: normalizePromptText(preset.format),
+              notes: normalizePromptText(preset.notes),
+            })
           }
+          // マッチしない場合はマッピングカタログの初期値（useState）を維持
         }
       } catch {
         // Ignore parse errors
@@ -448,14 +451,25 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
     }
   }, [setCurrentPromptValues])
 
-  // Apply default preset if no select matches
+  // 保存設定がない場合のフォールバック
   useEffect(() => {
     const savedConfig = localStorage.getItem(STORAGE_KEY)
     if (savedConfig) return
 
     if (systemPromptPresets.length > 0) {
       const savedPreset = localStorage.getItem(SELECTED_PROMPT_KEY)
-      const preset = systemPromptPresets.find(p => p.name === savedPreset) || systemPromptPresets[0]
+      // マッピングカタログ + システムプロンプトプリセットから検索
+      const catalogPresets: SystemPromptPreset[] = MAPPING_PRESET_CATALOG.map((preset) => ({
+        name: preset.name,
+        role: preset.systemPrompt.role,
+        purpose: preset.systemPrompt.purpose,
+        format: preset.systemPrompt.format,
+        notes: preset.systemPrompt.notes,
+      }))
+      const allPresets = [...catalogPresets, ...systemPromptPresets]
+      const preset = savedPreset
+        ? allPresets.find(p => p.name === savedPreset)
+        : undefined
       if (preset) {
         setCurrentPromptValues({
           role: normalizePromptText(preset.role),
@@ -464,6 +478,7 @@ export function useReviewerSettings(): UseReviewerSettingsReturn {
           notes: normalizePromptText(preset.notes),
         })
       }
+      // マッチしない場合はマッピングカタログの初期値（useState）を維持
     }
   }, [systemPromptPresets, setCurrentPromptValues])
 

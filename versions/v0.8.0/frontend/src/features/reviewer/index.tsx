@@ -497,6 +497,7 @@ export function Reviewer() {
                 onValueChange={updatePromptValue}
                 isCollapsible={true}
                 defaultExpanded={false}
+                disabledFields={['format']}
               />
 
               {/* Token estimate */}
