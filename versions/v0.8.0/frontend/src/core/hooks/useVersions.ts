@@ -5,7 +5,7 @@ const COOKIE_NAME = 'app_version'
 
 // デフォルトのバージョン情報
 const DEFAULT_VERSIONS: VersionInfo[] = [
-  { value: 'v0.8.0', label: 'v0.8.0', isLatest: true },
+  { value: 'v0.1.0', label: 'v0.1.0', isLatest: true },
 ]
 
 // Cookieヘルパー

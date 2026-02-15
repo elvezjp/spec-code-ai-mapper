@@ -1,6 +1,6 @@
 [project]
 name = "spec-code-ai-mapper-backend"
-version = "0.8.0"
+version = "0.1.0"
 description = "spec-code-ai-mapper backend"
 requires-python = ">=3.10"
 dependencies = [
