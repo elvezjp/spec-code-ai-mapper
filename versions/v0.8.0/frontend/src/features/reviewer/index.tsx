@@ -28,7 +28,7 @@ import {
 } from './components'
 import { useFileConversion, useReviewerSettings, useZipExport, useSplitSettings } from './hooks'
 import { testLlmConnection, executeStructureMatching } from './services/api'
-import type { MatchedGroup, MappingExecutionMeta } from './types'
+import type { MatchedGroup, MappingExecutionMeta, CodeLineMap } from './types'
 
 const APP_INFO = {
   name: 'spec-code-ai-mapper',
@@ -109,6 +109,7 @@ export function Reviewer() {
   const [mappingError, setMappingError] = useState<string | null>(null)
   const [mappingReportText, setMappingReportText] = useState('')
   const [mappingMeta, setMappingMeta] = useState<MappingExecutionMeta | null>(null)
+  const [codeLineMap, setCodeLineMap] = useState<CodeLineMap>(new Map())
 
   // System prompt text for token estimation
   const systemPromptText = useMemo(() => {
@@ -249,6 +250,16 @@ export function Reviewer() {
 
       if (response.success && response.groups) {
         const meta = response.reviewMeta
+
+        // Build codeLineMap from splitPreviewResult.codeParts
+        const lineMap: CodeLineMap = new Map()
+        if (splitPreviewResult.codeParts) {
+          for (const part of splitPreviewResult.codeParts) {
+            lineMap.set(part.id, { startLine: part.startLine, endLine: part.endLine })
+          }
+        }
+        setCodeLineMap(lineMap)
+
         setMappingResult(response.groups)
         setMappingReportText(buildReportText(response.groups))
         setMappingMeta({
@@ -297,8 +308,8 @@ export function Reviewer() {
 
   const handleDownloadCSV = useCallback(() => {
     if (!mappingResult) return
-    downloadMappingCSV(mappingResult)
-  }, [mappingResult, downloadMappingCSV])
+    downloadMappingCSV(mappingResult, codeLineMap)
+  }, [mappingResult, codeLineMap, downloadMappingCSV])
 
   const handleDownloadZip = useCallback(() => {
     if (!mappingResult || !mappingMeta || !specMarkdown || !codeWithLineNumbers) return
@@ -309,8 +320,9 @@ export function Reviewer() {
       systemPrompt: currentPromptValues,
       specMarkdown,
       codeWithLineNumbers,
+      codeLineMap,
     })
-  }, [mappingResult, mappingMeta, mappingReportText, currentPromptValues, specMarkdown, codeWithLineNumbers, downloadMappingZip])
+  }, [mappingResult, mappingMeta, mappingReportText, currentPromptValues, specMarkdown, codeWithLineNumbers, codeLineMap, downloadMappingZip])
 
   const handleBackFromExecuting = useCallback(() => {
     setMappingError(null)
@@ -557,6 +569,7 @@ export function Reviewer() {
                 mappingResult={mappingResult}
                 executionMeta={mappingMeta}
                 reportText={mappingReportText}
+                codeLineMap={codeLineMap}
                 onCopyReport={handleCopyReport}
                 onDownloadReport={handleDownloadReport}
                 onDownloadCSV={handleDownloadCSV}

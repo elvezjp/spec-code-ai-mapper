@@ -1,13 +1,14 @@
 import { Download } from 'lucide-react'
 import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@core/index'
-import type { MatchedGroup } from '../types'
+import type { MatchedGroup, CodeLineMap } from '../types'
 
 interface MappingResultTableProps {
   groups: MatchedGroup[]
+  codeLineMap: CodeLineMap
   onDownloadCSV: () => void
 }
 
-export function MappingResultTable({ groups, onDownloadCSV }: MappingResultTableProps) {
+export function MappingResultTable({ groups, codeLineMap, onDownloadCSV }: MappingResultTableProps) {
   const totalDocSections = new Set(
     groups.flatMap((g) => g.docSections.map((ds) => ds.id))
   ).size
@@ -27,16 +28,18 @@ export function MappingResultTable({ groups, onDownloadCSV }: MappingResultTable
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell className="w-20">ID</TableHeaderCell>
-              <TableHeaderCell>Specification Section</TableHeaderCell>
-              <TableHeaderCell>Associated Code</TableHeaderCell>
-              <TableHeaderCell>Reason</TableHeaderCell>
+              <TableHeaderCell className="w-16">項番</TableHeaderCell>
+              <TableHeaderCell>グループ名</TableHeaderCell>
+              <TableHeaderCell>設計書セクション</TableHeaderCell>
+              <TableHeaderCell>コードシンボル</TableHeaderCell>
+              <TableHeaderCell>理由</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {groups.map((group) => (
+            {groups.map((group, index) => (
               <TableRow key={group.groupId}>
-                <TableCell className="font-mono text-sm">{group.groupId}</TableCell>
+                <TableCell className="font-mono text-sm text-center">{index + 1}</TableCell>
+                <TableCell className="text-sm font-medium">{group.groupName}</TableCell>
                 <TableCell>
                   {group.docSections.map((ds) => (
                     <div key={ds.id} className="mb-1">
@@ -48,13 +51,21 @@ export function MappingResultTable({ groups, onDownloadCSV }: MappingResultTable
                   ))}
                 </TableCell>
                 <TableCell>
-                  {group.codeSymbols.map((cs, idx) => (
-                    <div key={`${cs.id}-${idx}`} className="mb-1 text-sm">
-                      <span className="text-gray-500">{cs.filename}</span>
-                      <span className="mx-1">::</span>
-                      <span className="font-medium text-blue-600">{cs.symbol}</span>
-                    </div>
-                  ))}
+                  {group.codeSymbols.map((cs, idx) => {
+                    const lineInfo = codeLineMap.get(cs.id)
+                    return (
+                      <div key={`${cs.id}-${idx}`} className="mb-1 text-sm">
+                        <span className="text-gray-500">{cs.filename}</span>
+                        <span className="mx-1">::</span>
+                        <span className="font-medium text-blue-600">{cs.symbol}</span>
+                        {lineInfo && (
+                          <span className="ml-1 text-gray-400 text-xs">
+                            (L{lineInfo.startLine}-{lineInfo.endLine})
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
                 </TableCell>
                 <TableCell className="text-sm text-gray-600">{group.reason}</TableCell>
               </TableRow>
@@ -62,10 +73,10 @@ export function MappingResultTable({ groups, onDownloadCSV }: MappingResultTable
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4 flex justify-end">
+      <div className="mt-4 flex">
         <button
           onClick={onDownloadCSV}
-          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition text-sm flex items-center gap-2"
+          className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow-md transition text-sm flex items-center justify-center gap-2"
         >
           <Download className="w-4 h-4" /> CSVダウンロード
         </button>

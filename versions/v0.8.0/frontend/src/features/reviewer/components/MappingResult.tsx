@@ -2,12 +2,13 @@ import { FileText, Clipboard, Save, Package, Download } from 'lucide-react'
 import { Table, TableBody, TableRow, TableCell } from '@core/index'
 import { ExecutionInfo } from './ExecutionInfo'
 import { MappingResultTable } from './MappingResultTable'
-import type { MatchedGroup, MappingExecutionMeta } from '../types'
+import type { MatchedGroup, MappingExecutionMeta, CodeLineMap } from '../types'
 
 interface MappingResultProps {
   mappingResult: MatchedGroup[]
   executionMeta: MappingExecutionMeta
   reportText: string
+  codeLineMap: CodeLineMap
   onCopyReport: (text: string) => void
   onDownloadReport: (text: string) => void
   onDownloadCSV: () => void
@@ -29,6 +30,7 @@ export function MappingResult({
   mappingResult,
   executionMeta,
   reportText,
+  codeLineMap,
   onCopyReport,
   onDownloadReport,
   onDownloadCSV,
@@ -48,7 +50,7 @@ export function MappingResult({
       </div>
 
       {/* Section 1: マッピング結果一覧 */}
-      <MappingResultTable groups={mappingResult} onDownloadCSV={onDownloadCSV} />
+      <MappingResultTable groups={mappingResult} codeLineMap={codeLineMap} onDownloadCSV={onDownloadCSV} />
 
       {/* Section 2: Execution Info */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">

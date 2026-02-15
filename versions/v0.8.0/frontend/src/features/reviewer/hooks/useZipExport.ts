@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import JSZip from 'jszip'
-import type { MatchedGroup, MappingExecutionMeta, SystemPromptValues } from '../types'
+import type { MatchedGroup, MappingExecutionMeta, SystemPromptValues, CodeLineMap } from '../types'
 
 interface MappingZipData {
   mappingResult: MatchedGroup[]
@@ -9,21 +9,28 @@ interface MappingZipData {
   systemPrompt: SystemPromptValues
   specMarkdown: string
   codeWithLineNumbers: string
+  codeLineMap: CodeLineMap
 }
 
-function buildTraceabilityMarkdown(groups: MatchedGroup[]): string {
-  let md = '# Traceability Matrix\n\n'
-  md += '| ID | Specification Section | Associated Code | Reason |\n'
-  md += '|---|---|---|---|\n'
+function formatCodeSymbol(cs: { id: string; filename: string; symbol: string }, codeLineMap?: CodeLineMap): string {
+  const lineInfo = codeLineMap?.get(cs.id)
+  const lineRange = lineInfo ? ` (L${lineInfo.startLine}-${lineInfo.endLine})` : ''
+  return `${cs.filename}::${cs.symbol}${lineRange}`
+}
 
-  groups.forEach((group) => {
+function buildTraceabilityMarkdown(groups: MatchedGroup[], codeLineMap?: CodeLineMap): string {
+  let md = '# Traceability Matrix\n\n'
+  md += '| 項番 | グループ名 | 設計書セクション | コードシンボル | 理由 |\n'
+  md += '|---|---|---|---|---|\n'
+
+  groups.forEach((group, index) => {
     const specSections = group.docSections
       .map((ds) => `${ds.id}: ${ds.title}`)
       .join('<br>')
     const codeSymbols = group.codeSymbols
-      .map((cs) => `${cs.filename} (${cs.symbol})`)
+      .map((cs) => formatCodeSymbol(cs, codeLineMap))
       .join('<br>')
-    md += `| ${group.groupId} | ${specSections} | ${codeSymbols} | ${group.reason} |\n`
+    md += `| ${index + 1} | ${group.groupName} | ${specSections} | ${codeSymbols} | ${group.reason} |\n`
   })
 
   return md
@@ -36,16 +43,16 @@ function escapeCSV(value: string): string {
   return value
 }
 
-function buildTraceabilityCSV(groups: MatchedGroup[]): string {
-  const header = 'ID,Specification Section,Associated Code,Reason'
-  const rows = groups.map((group) => {
+function buildTraceabilityCSV(groups: MatchedGroup[], codeLineMap?: CodeLineMap): string {
+  const header = '項番,グループ名,設計書セクション,コードシンボル,理由'
+  const rows = groups.map((group, index) => {
     const specSections = group.docSections
       .map((ds) => `${ds.id}: ${ds.title}`)
       .join('; ')
     const codeSymbols = group.codeSymbols
-      .map((cs) => `${cs.filename}::${cs.symbol}`)
+      .map((cs) => formatCodeSymbol(cs, codeLineMap))
       .join('; ')
-    return [group.groupId, specSections, codeSymbols, group.reason]
+    return [String(index + 1), group.groupName, specSections, codeSymbols, group.reason]
       .map(escapeCSV)
       .join(',')
   })
@@ -99,7 +106,7 @@ ${prompt.notes}
 interface UseZipExportReturn {
   downloadSpecMarkdown: (markdown: string) => void
   downloadCodeWithLineNumbers: (code: string) => void
-  downloadMappingCSV: (groups: MatchedGroup[]) => void
+  downloadMappingCSV: (groups: MatchedGroup[], codeLineMap?: CodeLineMap) => void
   downloadMappingZip: (data: MappingZipData) => Promise<void>
 }
 
@@ -124,8 +131,8 @@ export function useZipExport(): UseZipExportReturn {
     URL.revokeObjectURL(url)
   }, [])
 
-  const downloadMappingCSV = useCallback((groups: MatchedGroup[]) => {
-    const csv = buildTraceabilityCSV(groups)
+  const downloadMappingCSV = useCallback((groups: MatchedGroup[], codeLineMap?: CodeLineMap) => {
+    const csv = buildTraceabilityCSV(groups, codeLineMap)
     const bom = '\uFEFF'
     const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
@@ -143,8 +150,8 @@ export function useZipExport(): UseZipExportReturn {
     zip.file('system-prompt.md', buildSystemPromptMarkdown(data.systemPrompt))
     zip.file('spec-markdown.md', data.specMarkdown)
     zip.file('code-numbered.txt', data.codeWithLineNumbers)
-    zip.file('traceability-matrix.md', buildTraceabilityMarkdown(data.mappingResult))
-    zip.file('mapping-result.csv', '\uFEFF' + buildTraceabilityCSV(data.mappingResult))
+    zip.file('traceability-matrix.md', buildTraceabilityMarkdown(data.mappingResult, data.codeLineMap))
+    zip.file('mapping-result.csv', '\uFEFF' + buildTraceabilityCSV(data.mappingResult, data.codeLineMap))
     zip.file('mapping-report.md', data.reportText)
 
     const blob = await zip.generateAsync({ type: 'blob' })
