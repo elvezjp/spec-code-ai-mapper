@@ -11,13 +11,11 @@
 
 A web application that uses AI to map design documents (Excel/Markdown) to program code, visualizing and managing "traceability" within your source code.
 
-<https://github.com/user-attachments/assets/78926022-1498-4d9a-923c-cdf3a9f06534>
-
-## What is AI Mapper?
-
 AI Mapper is a tool that automatically maps sections of design documents (Markdown/Excel) to classes or methods in source code (Java/Python) using AI. In large-scale development projects, it helps you instantly understand whether specifications are correctly implemented in code and which design sections are affected by a change.
 
-## Key Features
+<https://github.com/user-attachments/assets/78926022-1498-4d9a-923c-cdf3a9f06534>
+
+## Features
 
 - **Traceability Matrix Generation**: Displays a list of mappings between design sections and code symbols, with AI explaining the reasoning.
 - **Markdown Export**: Export mapping results as a Markdown table, ready for project traceability documentation.
@@ -28,7 +26,7 @@ AI Mapper is a tool that automatically maps sections of design documents (Markdo
   - Splits large files into meaningful units (e.g., chapters or functions) for precise mapping within LLM token limits.
 - **AI Review**: Automatically checks for inconsistencies between design and implementation based on mapping results.
 
-## High-Precision Mapping via Structure Matching ([Details](docs/structure-matching.md))
+### High-Precision Mapping via Structure Matching ([Details](docs/structure-matching.md))
 
 Instead of simple line-based splitting, it analyzes the chapter structure of design documents and the AST (Abstract Syntax Tree) of code to split and match them accurately.
 
@@ -36,7 +34,7 @@ Instead of simple line-based splitting, it analyzes the chapter structure of des
 2. **AI Matching**: AI analyzes INDEX and MAP to identify optimal many-to-many mappings.
 3. **Result Output**: Displays mapping results and reasoning as a Traceability Matrix.
 
-### Mapping Methods
+#### Mapping Methods
 
 Three mapping methods are available depending on your needs. The system prompt sent to the AI changes based on the selected method.
 
@@ -46,7 +44,7 @@ Three mapping methods are available depending on your needs. The system prompt s
 | **Strict (ID-based)** | Prioritizes matching by ID and symbol name. Suitable when traceability is well-defined. |
 | **Detailed (Content-aware)** | Increases accuracy by partially referencing section content (increases token consumption). |
 
-### Output Format
+#### Output Format
 
 Mapping results are output as a **group-based** Traceability Matrix, where related design sections and code symbols are grouped together. A single group may contain multiple design sections and multiple code symbols.
 
@@ -59,21 +57,14 @@ Mapping results are output as a **group-based** Traceability Matrix, where relat
 
 Results can be exported in Markdown format.
 
-## Usage
+## Use Cases
 
-1. **Prepare Files**:
-   - Upload your design document (Excel) and click "Convert to Markdown".
-   - Upload your program (source code) and click "Convert with add-line-numbers".
-2. **Split Settings**:
-   - In "Split Settings", choose units for AI analysis (you can check the preview).
-3. **Run AI Mapping**:
-   - Click **"AI Mapper"** in the header to navigate to the Mapper screen.
-   - Click "Run Re-matching" to start the AI mapping process.
-4. **View & Export**:
-   - Review the generated Traceability Matrix.
-   - Click "Export to Markdown" to download the traceability document.
+- **Design-Code Traceability**: AI automatically maps which design document sections correspond to which parts of the code, providing full visibility.
+- **Impact Analysis**: Identify affected design sections when code changes are made. Prevent missed updates in design documents.
+- **Quality Management**: Manage design-implementation consistency with AI, detecting divergence early.
+- **AI/LLM Integration**: Semantically split design documents and code into AI-friendly formats for processing.
 
-## System Architecture (v0.8.0)
+## System Architecture
 
 - **Frontend**: Vite + React + TypeScript + Tailwind CSS
 - **Backend**: Python / FastAPI
@@ -90,12 +81,12 @@ git clone git@github.com:elvezjp/spec-code-ai-mapper.git
 cd spec-code-ai-mapper
 ```
 
-### Quick Start (v0.8.0)
+### Quick Start
 
 **Backend**
 
 ```bash
-cd versions/v0.8.0/backend
+cd versions/v0.1.0/backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -103,18 +94,90 @@ uv run uvicorn app.main:app --reload --port 8000
 **Frontend**
 
 ```bash
-cd versions/v0.8.0/frontend
+cd versions/v0.1.0/frontend
 npm install
 npm run dev
 ```
 
 Open <http://localhost:5173> in your browser.
 
----
+## Usage
+
+1. **Prepare Files**:
+   - Upload your design document (Excel) and click "Convert to Markdown".
+   - Upload your program (source code) and click "Convert with add-line-numbers".
+2. **Split Settings**:
+   - In "Split Settings", choose units for AI analysis (you can check the preview).
+3. **Run AI Mapping**:
+   - Click **"AI Mapper"** in the header to navigate to the Mapper screen.
+   - Click "Run Re-matching" to start the AI mapping process.
+4. **View & Export**:
+   - Review the generated Traceability Matrix.
+   - Click "Export to Markdown" to download the traceability document.
+
+## Directory Structure
+
+```text
+spec-code-ai-mapper/
+├── docker-compose.yml           # Docker Compose configuration
+├── Dockerfile.dev               # Development Dockerfile
+├── docker-entrypoint.sh         # Docker startup script
+├── ecosystem.config.js          # PM2 configuration (production)
+├── dev.ecosystem.config.js      # PM2 configuration (development)
+├── nginx/                       # Nginx configuration
+├── latest -> versions/v0.1.0    # Symlink (points to latest version)
+│
+├── versions/                    # Version storage
+│   └── v0.1.0/                  # Latest version
+│       ├── backend/             # Python / FastAPI
+│       ├── frontend/            # Vite + React + TypeScript
+│       └── spec.md              # Specification document
+│
+├── docs/                        # Documentation
+│   └── structure-matching.md    # Structure matching details
+│
+├── scripts/                     # Utility scripts
+│
+├── add-line-numbers/            # Subtree (elvezjp)
+├── code2map/                    # Subtree (elvezjp)
+├── excel2md/                    # Subtree (elvezjp)
+├── markitdown/                  # Subtree (Microsoft)
+├── md2map/                      # Subtree (elvezjp)
+└── README.md                    # This file
+```
+
+## Documentation
+
+- [CHANGELOG.md](CHANGELOG.md) - Changelog
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [SECURITY.md](SECURITY.md) - Security policy
+- [Structure Matching Details](docs/structure-matching.md) - AI mapping and structure matching technical details
+
+## Security
+
+For details, see [SECURITY.md](SECURITY.md).
+
+- Security measures for file processing (Excel files opened in `read_only=True` mode, file size limits, etc.)
+- API keys should be managed via environment variables, not hardcoded
+- Only process files from trusted sources
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+- Bug reports and feature requests are accepted via GitHub Issues
+- Pull requests should target the `main` branch
+- Follow the existing codebase's coding style
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## Background
 
-This tool was developed as part of **IXV (Ikushibu)**, an AI support system for Japanese development documents. It aims to prevent divergence between design and code, streamlining quality management through AI.
+This tool was born during the development of **IXV (Ikushibu)**, an AI assistant for Japanese development documents and specifications.
+
+IXV tackles the challenges of understanding, structuring, and utilizing Japanese documents in software development. This repository provides a standalone portion of that work as open source.
 
 ## License
 
@@ -124,3 +187,15 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 - **Email**: <info@elvez.co.jp>
 - **To**: Elvez Co., Ltd.
+
+## Related Projects
+
+This repository includes the following external repositories added via git subtree.
+
+| Directory | Repository | Description |
+|-----------|-----------|-------------|
+| `add-line-numbers/` | https://github.com/elvezjp/add-line-numbers | Tool to add line numbers to files |
+| `code2map/` | https://github.com/elvezjp/code2map | Source code to mind map conversion tool |
+| `excel2md/` | https://github.com/elvezjp/excel2md | Excel to CSV Markdown conversion tool |
+| `markitdown/` | https://github.com/microsoft/markitdown | Convert various file formats to Markdown |
+| `md2map/` | https://github.com/elvezjp/md2map | Markdown to mind map conversion tool |
