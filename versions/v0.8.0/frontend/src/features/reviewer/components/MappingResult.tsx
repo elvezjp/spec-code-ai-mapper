@@ -1,6 +1,7 @@
-import { Layers, FileText, Clipboard, Save, Package, Download } from 'lucide-react'
-import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@core/index'
+import { FileText, Clipboard, Save, Package, Download } from 'lucide-react'
+import { Table, TableBody, TableRow, TableCell } from '@core/index'
 import { ExecutionInfo } from './ExecutionInfo'
+import { MappingResultTable } from './MappingResultTable'
 import type { MatchedGroup, MappingExecutionMeta } from '../types'
 
 interface MappingResultProps {
@@ -31,13 +32,6 @@ export function MappingResult({
   onDownloadZip,
   onBack,
 }: MappingResultProps) {
-  const totalDocSections = new Set(
-    mappingResult.flatMap((g) => g.docSections.map((ds) => ds.id))
-  ).size
-  const totalCodeSymbols = new Set(
-    mappingResult.flatMap((g) => g.codeSymbols.map((cs) => `${cs.filename}::${cs.symbol}`))
-  ).size
-
   return (
     <div className="w-fit max-w-full mx-auto min-w-[56rem]">
       {/* Header */}
@@ -50,56 +44,8 @@ export function MappingResult({
         </div>
       </div>
 
-      {/* Section 1: Traceability Matrix */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <Layers className="w-5 h-5 text-blue-500" /> Traceability Matrix
-        </h2>
-        <div className="flex gap-6 text-sm text-gray-600 mb-4">
-          <span>グループ数: <strong className="text-gray-800">{mappingResult.length}</strong></span>
-          <span>設計書セクション: <strong className="text-gray-800">{totalDocSections}</strong></span>
-          <span>コードシンボル: <strong className="text-gray-800">{totalCodeSymbols}</strong></span>
-        </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell className="w-20">ID</TableHeaderCell>
-                <TableHeaderCell>Specification Section</TableHeaderCell>
-                <TableHeaderCell>Associated Code</TableHeaderCell>
-                <TableHeaderCell>Reason</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {mappingResult.map((group) => (
-                <TableRow key={group.groupId}>
-                  <TableCell className="font-mono text-sm">{group.groupId}</TableCell>
-                  <TableCell>
-                    {group.docSections.map((ds) => (
-                      <div key={ds.id} className="mb-1">
-                        <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs mr-2">
-                          {ds.id}
-                        </span>
-                        {ds.title}
-                      </div>
-                    ))}
-                  </TableCell>
-                  <TableCell>
-                    {group.codeSymbols.map((cs, idx) => (
-                      <div key={`${cs.id}-${idx}`} className="mb-1 text-sm">
-                        <span className="text-gray-500">{cs.filename}</span>
-                        <span className="mx-1">::</span>
-                        <span className="font-medium text-blue-600">{cs.symbol}</span>
-                      </div>
-                    ))}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">{group.reason}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+      {/* Section 1: マッピング結果一覧 */}
+      <MappingResultTable groups={mappingResult} />
 
       {/* Section 2: Execution Info */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
