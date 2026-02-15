@@ -69,6 +69,8 @@ class LLMConfig(BaseModel):
     )
 
 
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーのレビュー実行API用スキーマ）
+# フロントエンド側の呼び出し（executeReview）は削除済み。
 class ReviewRequest(BaseModel):
     """レビューAPIのリクエスト"""
 
@@ -174,6 +176,8 @@ class ReviewMeta(BaseModel):
     outputTokens: int
 
 
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーのレビュー実行API用スキーマ）
+# フロントエンド側の呼び出し（executeReview）は削除済み。
 class ReviewResponse(BaseModel):
     """レビューAPIのレスポンス"""
 
@@ -424,6 +428,9 @@ class StructureMatchingResponse(BaseModel):
 
 # =============================================================================
 # Group Review API スキーマ
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーのグループレビューAPI用スキーマ）
+# マッパーでは構造マッチングのみ使用し、グループ単位のレビューは行わない。
+# フロントエンド側の呼び出し（executeGroupReview）は削除済み。
 # =============================================================================
 
 
@@ -473,6 +480,9 @@ class GroupReviewResponse(BaseModel):
 
 # =============================================================================
 # Integrate API スキーマ
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーの結果統合API用スキーマ）
+# マッパーでは構造マッチングのみ使用し、グループレビュー結果の統合は行わない。
+# フロントエンド側の呼び出し（executeIntegrate）は削除済み。
 # =============================================================================
 
 

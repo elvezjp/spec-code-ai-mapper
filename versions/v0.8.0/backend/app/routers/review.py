@@ -8,8 +8,6 @@ from fastapi import APIRouter
 
 from app.models.schemas import (
     LLMConfig,
-    ReviewRequest,
-    ReviewResponse,
     ReviewMeta,
     TestConnectionRequest,
     TestConnectionResponse,
@@ -19,6 +17,10 @@ from app.models.schemas import (
     MatchedGroup,
     MatchedDocSection,
     MatchedCodeSymbol,
+    # [UNUSED] AIマッパーでは未使用（旧AIレビュアー用スキーマ）
+    # フロントエンド側の呼び出しは削除済み。
+    ReviewRequest,
+    ReviewResponse,
     # Group Review API
     GroupReviewRequest,
     GroupReviewResponse,
@@ -45,6 +47,9 @@ MAX_DESIGN_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_CODE_SIZE = 5 * 1024 * 1024  # 5MB
 
 
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーのレビュー実行API）
+# マッパーでは /api/review/structure-matching のみ使用する。
+# フロントエンド側の呼び出し（executeReview）は削除済み。
 @router.post("/review", response_model=ReviewResponse)
 async def review_api(request: ReviewRequest):
     """
@@ -365,6 +370,10 @@ async def structure_matching(request: StructureMatchingRequest):
         )
 
 
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーのグループレビューAPI）
+# マッパーでは構造マッチング（/api/review/structure-matching）のみ使用し、
+# グループ単位のレビューは行わない。
+# フロントエンド側の呼び出し（executeGroupReview）は削除済み。
 @router.post("/review/group", response_model=GroupReviewResponse)
 async def review_group(request: GroupReviewRequest):
     """
@@ -464,6 +473,10 @@ async def review_group(request: GroupReviewRequest):
         )
 
 
+# [UNUSED] AIマッパーでは未使用（旧AIレビュアーの結果統合API）
+# マッパーでは構造マッチング（/api/review/structure-matching）のみ使用し、
+# グループレビュー結果の統合は行わない。
+# フロントエンド側の呼び出し（executeIntegrate）は削除済み。
 @router.post("/review/integrate", response_model=IntegrateResponse)
 async def integrate_reviews(request: IntegrateRequest):
     """
