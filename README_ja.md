@@ -13,7 +13,7 @@
 
 AI マッパーは、設計書（Markdown/Excel）の各セクションと、ソースコード（Java/Python）のクラスやメソッドをAIが自動的にマッピングするツールです。大規模な開発プロジェクトにおいて、仕様がコードに正しく実装されているか、また修正がどの設計セクションに影響するかを瞬時に把握することを目的としています。
 
-<https://github.com/user-attachments/assets/78926022-1498-4d9a-923c-cdf3a9f06534>
+https://github.com/user-attachments/assets/235aca23-ef13-4d25-b1a1-a7c085feb583
 
 ## 特徴
 
