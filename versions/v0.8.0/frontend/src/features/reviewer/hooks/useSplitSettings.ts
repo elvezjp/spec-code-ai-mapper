@@ -124,10 +124,14 @@ export function useSplitSettings(): UseSplitSettingsReturn {
   }, [])
 
   const handleSetSettings = useCallback((newSettings: SplitSettings) => {
-    setSettings(newSettings)
-    // 設定が変更されたらプレビュー結果をクリア
-    setPreviewResult(null)
-    setError(null)
+    setSettings(prev => {
+      // 分割に影響する設定（documentMaxDepth）が変更された場合のみプレビューをクリア
+      if (prev.documentMaxDepth !== newSettings.documentMaxDepth) {
+        setPreviewResult(null)
+        setError(null)
+      }
+      return newSettings
+    })
   }, [])
 
   return {
