@@ -248,15 +248,15 @@ export function Reviewer() {
       })
 
       if (response.success && response.groups) {
-        const executedAt = new Date().toISOString()
+        const meta = response.reviewMeta
         setMappingResult(response.groups)
         setMappingReportText(buildReportText(response.groups))
         setMappingMeta({
-          version: APP_INFO.version,
-          modelId: llmConfig?.model || 'unknown',
-          executedAt,
-          inputTokens: response.tokensUsed?.input,
-          outputTokens: response.tokensUsed?.output,
+          version: meta?.version || APP_INFO.version,
+          modelId: meta?.modelId || llmConfig?.model || 'unknown',
+          executedAt: meta?.executedAt || new Date().toISOString(),
+          inputTokens: meta?.inputTokens ?? response.tokensUsed?.input,
+          outputTokens: meta?.outputTokens ?? response.tokensUsed?.output,
           designs: specFiles.map((f) => ({
             filename: f.filename,
             type: f.type,

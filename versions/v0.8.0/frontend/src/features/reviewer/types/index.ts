@@ -172,11 +172,23 @@ export interface MatchedGroup {
   estimatedTokens: number
 }
 
+export interface ReviewMeta {
+  version: string
+  modelId: string
+  provider?: string
+  executedAt: string
+  designs: { filename: string; role: string; isMain: boolean; type: string; tool: string }[]
+  programs: { filename: string }[]
+  inputTokens: number
+  outputTokens: number
+}
+
 export interface StructureMatchingResponse {
   success: boolean
   groups: MatchedGroup[]
   totalGroups: number
   tokensUsed?: { input: number; output: number }
+  reviewMeta?: ReviewMeta
   error?: string
 }
 

@@ -418,6 +418,7 @@ class StructureMatchingResponse(BaseModel):
     groups: list[MatchedGroup] = []
     totalGroups: int = 0
     tokensUsed: dict = {}  # トークン使用量 {"input": N, "output": M}
+    reviewMeta: ReviewMeta | None = None  # 実行メタ情報（モデルID、トークン数等）
     error: str | None = None
 
 

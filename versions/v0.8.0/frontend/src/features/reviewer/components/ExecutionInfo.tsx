@@ -35,7 +35,7 @@ export function ExecutionInfo({
 }: ExecutionInfoProps) {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2 text-sm">
+      <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm max-w-lg">
         <div className="text-gray-600">バージョン:</div>
         <div className="text-gray-800">{version || '-'}</div>
         <div className="text-gray-600">モデルID:</div>

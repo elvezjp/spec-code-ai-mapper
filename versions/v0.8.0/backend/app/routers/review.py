@@ -30,7 +30,10 @@ from app.models.schemas import (
     IntegratedReport,
 )
 from app.services.llm_service import get_llm_provider
-from app.services.prompt_builder import build_system_prompt, build_review_meta
+from app.services.prompt_builder import (
+    build_system_prompt,
+    build_review_meta,
+)
 
 # pyproject.tomlからバージョンを取得
 APP_VERSION = version("spec-code-ai-mapper-backend")
@@ -325,11 +328,24 @@ async def structure_matching(request: StructureMatchingRequest):
                 )
             )
 
+        # ReviewMeta構築（結果統合APIと同様）
+        review_meta_dict = build_review_meta(
+            version=f"v{APP_VERSION}",
+            model_id=provider.model_id,
+            provider=provider.provider_name,
+            designs=[],
+            codes=[],
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+        review_meta = ReviewMeta(**review_meta_dict)
+
         return StructureMatchingResponse(
             success=True,
             groups=groups,
             totalGroups=len(groups),
             tokensUsed={"input": input_tokens, "output": output_tokens},
+            reviewMeta=review_meta,
         )
 
     except json.JSONDecodeError as e:
