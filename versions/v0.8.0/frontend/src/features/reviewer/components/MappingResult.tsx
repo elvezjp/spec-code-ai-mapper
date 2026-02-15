@@ -21,9 +21,8 @@ const downloadFiles = [
   { name: 'system-prompt.md', desc: 'システムプロンプト（役割・目的・出力形式・注意事項）' },
   { name: 'spec-markdown.md', desc: '変換後の設計書（マークダウン形式）' },
   { name: 'code-numbered.txt', desc: '行番号付きプログラム' },
-  { name: 'traceability-matrix.md', desc: 'マッピング結果（Traceability Matrix）' },
+  { name: 'mapping-result-report.md', desc: 'マッピング結果レポート（セクション形式 + テーブル形式）' },
   { name: 'mapping-result.csv', desc: 'マッピング結果一覧（CSV形式）' },
-  { name: 'mapping-report.md', desc: 'AIの出力レポート全文' },
 ]
 
 export function MappingResult({
@@ -52,25 +51,14 @@ export function MappingResult({
       {/* Section 1: マッピング結果一覧 */}
       <MappingResultTable groups={mappingResult} codeLineMap={codeLineMap} onDownloadCSV={onDownloadCSV} />
 
-      {/* Section 2: Execution Info */}
+      {/* Section 2: マッピング結果レポート */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">実行情報</h2>
-        <ExecutionInfo
-          version={executionMeta.version}
-          modelId={executionMeta.modelId}
-          executedAt={executionMeta.executedAt}
-          inputTokens={executionMeta.inputTokens}
-          outputTokens={executionMeta.outputTokens}
-          designs={executionMeta.designs}
-          programs={executionMeta.programs}
-        />
-      </div>
-
-      {/* Section 3: Detailed Report */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <FileText className="w-5 h-5" /> 詳細レポート
+        <h2 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+          <FileText className="w-5 h-5" /> マッピング結果レポート
         </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          マッピング結果一覧の内容をマークダウン形式で出力したレポートです。
+        </p>
         <div className="bg-gray-50 rounded-lg p-4 font-mono text-sm overflow-auto max-h-96 mb-4">
           <pre className="whitespace-pre-wrap text-gray-700">{reportText}</pre>
         </div>
@@ -88,6 +76,20 @@ export function MappingResult({
             <Save className="w-4 h-4" /> ダウンロード
           </button>
         </div>
+      </div>
+
+      {/* Section 3: Execution Info */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">実行情報</h2>
+        <ExecutionInfo
+          version={executionMeta.version}
+          modelId={executionMeta.modelId}
+          executedAt={executionMeta.executedAt}
+          inputTokens={executionMeta.inputTokens}
+          outputTokens={executionMeta.outputTokens}
+          designs={executionMeta.designs}
+          programs={executionMeta.programs}
+        />
       </div>
 
       {/* Section 4: ZIP Download */}

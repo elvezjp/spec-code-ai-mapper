@@ -18,8 +18,30 @@ function formatCodeSymbol(cs: { id: string; filename: string; symbol: string }, 
   return `${cs.filename}::${cs.symbol}${lineRange}`
 }
 
-function buildTraceabilityMarkdown(groups: MatchedGroup[], codeLineMap?: CodeLineMap): string {
-  let md = '# Traceability Matrix\n\n'
+function buildSectionReport(groups: MatchedGroup[], codeLineMap?: CodeLineMap): string {
+  let report = '# マッピング結果レポート\n\n'
+  report += `グループ数: ${groups.length}\n\n`
+
+  groups.forEach((group, index) => {
+    report += `## ${index + 1}. ${group.groupName} (${group.groupId})\n\n`
+    report += '### 設計書セクション\n'
+    group.docSections.forEach((ds) => {
+      report += `- ${ds.id}: ${ds.title} (${ds.path})\n`
+    })
+    report += '\n### コードシンボル\n'
+    group.codeSymbols.forEach((cs) => {
+      const lineInfo = codeLineMap?.get(cs.id)
+      const lineRange = lineInfo ? ` (L${lineInfo.startLine}-${lineInfo.endLine})` : ''
+      report += `- ${cs.filename} :: ${cs.symbol}${lineRange}\n`
+    })
+    report += `\n### 理由\n${group.reason}\n\n---\n\n`
+  })
+
+  return report
+}
+
+function buildTableReport(groups: MatchedGroup[], codeLineMap?: CodeLineMap): string {
+  let md = '# マッピング結果一覧\n\n'
   md += '| 項番 | グループ名 | 設計書セクション | コードシンボル | 理由 |\n'
   md += '|---|---|---|---|---|\n'
 
@@ -34,6 +56,10 @@ function buildTraceabilityMarkdown(groups: MatchedGroup[], codeLineMap?: CodeLin
   })
 
   return md
+}
+
+export function buildMappingResultReport(groups: MatchedGroup[], codeLineMap?: CodeLineMap): string {
+  return buildSectionReport(groups, codeLineMap) + '\n' + buildTableReport(groups, codeLineMap)
 }
 
 function escapeCSV(value: string): string {
@@ -80,9 +106,8 @@ ${meta.outputTokens !== undefined ? `- 出力トークン: ${meta.outputTokens.t
 | system-prompt.md | システムプロンプト（役割・目的・出力形式・注意事項） |
 | spec-markdown.md | 変換後の設計書（マークダウン形式） |
 | code-numbered.txt | 行番号付きプログラム |
-| traceability-matrix.md | マッピング結果（Traceability Matrix） |
+| mapping-result-report.md | マッピング結果レポート（セクション形式 + テーブル形式） |
 | mapping-result.csv | マッピング結果一覧（CSV形式） |
-| mapping-report.md | AIの出力レポート全文 |
 `
 }
 
@@ -150,9 +175,8 @@ export function useZipExport(): UseZipExportReturn {
     zip.file('system-prompt.md', buildSystemPromptMarkdown(data.systemPrompt))
     zip.file('spec-markdown.md', data.specMarkdown)
     zip.file('code-numbered.txt', data.codeWithLineNumbers)
-    zip.file('traceability-matrix.md', buildTraceabilityMarkdown(data.mappingResult, data.codeLineMap))
+    zip.file('mapping-result-report.md', data.reportText)
     zip.file('mapping-result.csv', '\uFEFF' + buildTraceabilityCSV(data.mappingResult, data.codeLineMap))
-    zip.file('mapping-report.md', data.reportText)
 
     const blob = await zip.generateAsync({ type: 'blob' })
     const url = URL.createObjectURL(blob)

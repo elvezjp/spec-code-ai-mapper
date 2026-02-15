@@ -26,7 +26,7 @@ import {
   MappingExecutingScreen,
   MappingResult,
 } from './components'
-import { useFileConversion, useReviewerSettings, useZipExport, useSplitSettings } from './hooks'
+import { useFileConversion, useReviewerSettings, useZipExport, useSplitSettings, buildMappingResultReport } from './hooks'
 import { testLlmConnection, executeStructureMatching } from './services/api'
 import type { MatchedGroup, MappingExecutionMeta, CodeLineMap } from './types'
 
@@ -178,26 +178,6 @@ export function Reviewer() {
     )
   }, [codeFiles, specMarkdown, specFiles, executeSplitPreview])
 
-  // Build report text from mapping result
-  const buildReportText = useCallback((groups: MatchedGroup[]) => {
-    let report = '# マッピング結果レポート\n\n'
-    report += `グループ数: ${groups.length}\n\n`
-
-    groups.forEach((group, index) => {
-      report += `## ${index + 1}. ${group.groupName} (${group.groupId})\n\n`
-      report += '### 設計書セクション\n'
-      group.docSections.forEach((ds) => {
-        report += `- ${ds.id}: ${ds.title} (${ds.path})\n`
-      })
-      report += '\n### コードシンボル\n'
-      group.codeSymbols.forEach((cs) => {
-        report += `- ${cs.filename} :: ${cs.symbol}\n`
-      })
-      report += `\n### 理由\n${group.reason}\n\n---\n\n`
-    })
-
-    return report
-  }, [])
 
   // Mapping execution
   const handleMapping = useCallback(async () => {
@@ -261,7 +241,7 @@ export function Reviewer() {
         setCodeLineMap(lineMap)
 
         setMappingResult(response.groups)
-        setMappingReportText(buildReportText(response.groups))
+        setMappingReportText(buildMappingResultReport(response.groups, lineMap))
         setMappingMeta({
           version: meta?.version || APP_INFO.version,
           modelId: meta?.modelId || llmConfig?.model || 'unknown',
@@ -287,7 +267,7 @@ export function Reviewer() {
       setMappingError(err instanceof Error ? err.message : 'エラーが発生しました。')
       setIsMapping(false)
     }
-  }, [splitPreviewResult, specMarkdown, codeFiles, specFiles, currentPromptValues, llmConfig, splitSettings.mappingPolicy, showExecuting, showResult, buildReportText])
+  }, [splitPreviewResult, specMarkdown, codeFiles, specFiles, currentPromptValues, llmConfig, splitSettings.mappingPolicy, showExecuting, showResult])
 
   // Result screen handlers
   const handleCopyReport = useCallback((text: string) => {
@@ -301,7 +281,7 @@ export function Reviewer() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'mapping-report.md'
+    a.download = 'mapping-result-report.md'
     a.click()
     URL.revokeObjectURL(url)
   }, [])
