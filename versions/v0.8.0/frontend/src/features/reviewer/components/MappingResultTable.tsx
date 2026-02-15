@@ -1,11 +1,13 @@
+import { Download } from 'lucide-react'
 import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@core/index'
 import type { MatchedGroup } from '../types'
 
 interface MappingResultTableProps {
   groups: MatchedGroup[]
+  onDownloadCSV: () => void
 }
 
-export function MappingResultTable({ groups }: MappingResultTableProps) {
+export function MappingResultTable({ groups, onDownloadCSV }: MappingResultTableProps) {
   const totalDocSections = new Set(
     groups.flatMap((g) => g.docSections.map((ds) => ds.id))
   ).size
@@ -59,6 +61,14 @@ export function MappingResultTable({ groups }: MappingResultTableProps) {
             ))}
           </TableBody>
         </Table>
+      </div>
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={onDownloadCSV}
+          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition text-sm flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" /> CSVダウンロード
+        </button>
       </div>
     </div>
   )

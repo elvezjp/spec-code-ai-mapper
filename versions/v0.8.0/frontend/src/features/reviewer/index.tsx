@@ -90,7 +90,7 @@ export function Reviewer() {
   } = useReviewerSettings()
 
   // Zip export
-  const { downloadSpecMarkdown, downloadCodeWithLineNumbers, downloadMappingZip } =
+  const { downloadSpecMarkdown, downloadCodeWithLineNumbers, downloadMappingCSV, downloadMappingZip } =
     useZipExport()
 
   // Split settings
@@ -294,6 +294,11 @@ export function Reviewer() {
     a.click()
     URL.revokeObjectURL(url)
   }, [])
+
+  const handleDownloadCSV = useCallback(() => {
+    if (!mappingResult) return
+    downloadMappingCSV(mappingResult)
+  }, [mappingResult, downloadMappingCSV])
 
   const handleDownloadZip = useCallback(() => {
     if (!mappingResult || !mappingMeta || !specMarkdown || !codeWithLineNumbers) return
@@ -554,6 +559,7 @@ export function Reviewer() {
                 reportText={mappingReportText}
                 onCopyReport={handleCopyReport}
                 onDownloadReport={handleDownloadReport}
+                onDownloadCSV={handleDownloadCSV}
                 onDownloadZip={handleDownloadZip}
                 onBack={handleBackFromResult}
               />

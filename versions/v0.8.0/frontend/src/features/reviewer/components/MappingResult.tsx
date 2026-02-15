@@ -10,6 +10,7 @@ interface MappingResultProps {
   reportText: string
   onCopyReport: (text: string) => void
   onDownloadReport: (text: string) => void
+  onDownloadCSV: () => void
   onDownloadZip: () => void
   onBack: () => void
 }
@@ -20,6 +21,7 @@ const downloadFiles = [
   { name: 'spec-markdown.md', desc: '変換後の設計書（マークダウン形式）' },
   { name: 'code-numbered.txt', desc: '行番号付きプログラム' },
   { name: 'traceability-matrix.md', desc: 'マッピング結果（Traceability Matrix）' },
+  { name: 'mapping-result.csv', desc: 'マッピング結果一覧（CSV形式）' },
   { name: 'mapping-report.md', desc: 'AIの出力レポート全文' },
 ]
 
@@ -29,6 +31,7 @@ export function MappingResult({
   reportText,
   onCopyReport,
   onDownloadReport,
+  onDownloadCSV,
   onDownloadZip,
   onBack,
 }: MappingResultProps) {
@@ -45,7 +48,7 @@ export function MappingResult({
       </div>
 
       {/* Section 1: マッピング結果一覧 */}
-      <MappingResultTable groups={mappingResult} />
+      <MappingResultTable groups={mappingResult} onDownloadCSV={onDownloadCSV} />
 
       {/* Section 2: Execution Info */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
