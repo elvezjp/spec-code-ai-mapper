@@ -27,19 +27,22 @@ client = TestClient(app)
 class TestSplitMarkdownAPI:
     """split_markdown() のテスト"""
 
+    @patch("md2map.generators.map_generator.generate_map")
     @patch("md2map.generators.parts_generator.generate_parts")
     @patch("md2map.generators.index_generator.generate_index")
     @patch("md2map.utils.file_utils.read_file")
     @patch("md2map.parsers.markdown_parser.MarkdownParser")
     def test_ut_spl_001_success_basic(
-        self, mock_parser_cls, mock_read_file, mock_gen_index, mock_gen_parts
+        self, mock_parser_cls, mock_read_file, mock_gen_index, mock_gen_parts, mock_gen_map
     ):
         """UT-SPL-001: 正常系（基本的なMarkdown分割）"""
+        import json
         import os
 
         # モックセクション
         mock_section = MagicMock()
         mock_section.title = "概要"
+        mock_section.display_name.return_value = "概要"
         mock_section.level = 1
         mock_section.path = "概要"
         mock_section.start_line = 1
@@ -68,6 +71,14 @@ class TestSplitMarkdownAPI:
 
         mock_gen_index.side_effect = write_index
 
+        # generate_mapがMAP.jsonを書き込む動作をシミュレート
+        def write_map(sections, out_dir, map_path):
+            with open(map_path, "w") as f:
+                json.dump([{"id": "MD1", "title": "概要"}], f)
+            return True
+
+        mock_gen_map.side_effect = write_map
+
         request = SplitMarkdownRequest(
             content="# 概要\n\nこれは概要です。\n\n詳細説明",
             filename="test.md",
@@ -86,19 +97,22 @@ class TestSplitMarkdownAPI:
         assert data["indexContent"] is not None
         assert "INDEX" in data["indexContent"]
 
+    @patch("md2map.generators.map_generator.generate_map")
     @patch("md2map.generators.parts_generator.generate_parts")
     @patch("md2map.generators.index_generator.generate_index")
     @patch("md2map.utils.file_utils.read_file")
     @patch("md2map.parsers.markdown_parser.MarkdownParser")
     def test_ut_spl_002_success_max_depth(
-        self, mock_parser_cls, mock_read_file, mock_gen_index, mock_gen_parts
+        self, mock_parser_cls, mock_read_file, mock_gen_index, mock_gen_parts, mock_gen_map
     ):
         """UT-SPL-002: 正常系（maxDepth指定）"""
+        import json
         import os
 
         # H1とH2の両方を含むセクション
         mock_section1 = MagicMock()
         mock_section1.title = "第1章"
+        mock_section1.display_name.return_value = "第1章"
         mock_section1.level = 1
         mock_section1.path = "第1章"
         mock_section1.start_line = 1
@@ -107,6 +121,7 @@ class TestSplitMarkdownAPI:
 
         mock_section2 = MagicMock()
         mock_section2.title = "1.1 概要"
+        mock_section2.display_name.return_value = "1.1 概要"
         mock_section2.level = 2
         mock_section2.path = "第1章 > 1.1 概要"
         mock_section2.start_line = 4
@@ -133,6 +148,13 @@ class TestSplitMarkdownAPI:
                 f.write("# INDEX\n\n- MD1: 第1章\n- MD2: 1.1 概要\n")
 
         mock_gen_index.side_effect = write_index
+
+        def write_map(sections, out_dir, map_path):
+            with open(map_path, "w") as f:
+                json.dump([], f)
+            return True
+
+        mock_gen_map.side_effect = write_map
 
         request = SplitMarkdownRequest(
             content="# 第1章\n\n章の説明\n## 1.1 概要\n\n概要の説明",
@@ -191,18 +213,21 @@ class TestSplitMarkdownAPI:
         assert data["success"] is False
         assert "エラー" in data["error"]
 
+    @patch("md2map.generators.map_generator.generate_map")
     @patch("md2map.generators.parts_generator.generate_parts")
     @patch("md2map.generators.index_generator.generate_index")
     @patch("md2map.utils.file_utils.read_file")
     @patch("md2map.parsers.markdown_parser.MarkdownParser")
     def test_ut_spl_010_token_estimation(
-        self, mock_parser_cls, mock_read_file, mock_gen_index, mock_gen_parts
+        self, mock_parser_cls, mock_read_file, mock_gen_index, mock_gen_parts, mock_gen_map
     ):
         """UT-SPL-010: トークン数推定"""
+        import json
         import os
 
         mock_section = MagicMock()
         mock_section.title = "日本語セクション"
+        mock_section.display_name.return_value = "日本語セクション"
         mock_section.level = 1
         mock_section.path = "日本語セクション"
         mock_section.start_line = 1
@@ -230,6 +255,13 @@ class TestSplitMarkdownAPI:
 
         mock_gen_index.side_effect = write_index
 
+        def write_map(sections, out_dir, map_path):
+            with open(map_path, "w") as f:
+                json.dump([], f)
+            return True
+
+        mock_gen_map.side_effect = write_map
+
         request = SplitMarkdownRequest(
             content=japanese_content,
             filename="test.md",
@@ -248,15 +280,17 @@ class TestSplitMarkdownAPI:
 class TestSplitCodeAPI:
     """split_code() のテスト"""
 
+    @patch("code2map.generators.map_generator.generate_map")
     @patch("code2map.generators.parts_generator.generate_parts")
     @patch("code2map.generators.index_generator.generate_index")
     @patch("code2map.utils.file_utils.read_lines")
     @patch("code2map.utils.file_utils.slice_lines")
     @patch("code2map.parsers.python_parser.PythonParser")
     def test_ut_spl_005_success_python(
-        self, mock_parser_cls, mock_slice, mock_read_lines, mock_gen_index, mock_gen_parts
+        self, mock_parser_cls, mock_slice, mock_read_lines, mock_gen_index, mock_gen_parts, mock_gen_map
     ):
         """UT-SPL-005: 正常系（Python）"""
+        import json
         import os
 
         # モックシンボル
@@ -275,9 +309,12 @@ class TestSplitCodeAPI:
         mock_read_lines.return_value = ["def hello():", "    print('hello')", ""]
         mock_slice.return_value = "def hello():\n    print('hello')\n"
 
-        # generate_partsがoutputディレクトリを作成する動作をシミュレート
+        # generate_partsがentriesを返す動作をシミュレート
+        mock_entries = [(mock_symbol, "PART-CD1.py")]
+
         def create_output_dir(symbols, lines, out_dir):
             os.makedirs(out_dir, exist_ok=True)
+            return mock_entries
 
         mock_gen_parts.side_effect = create_output_dir
 
@@ -286,6 +323,13 @@ class TestSplitCodeAPI:
                 f.write("# CODE INDEX\n\n- CD1: hello (function)\n")
 
         mock_gen_index.side_effect = write_index
+
+        # generate_mapがMAP.jsonを書き込む動作をシミュレート
+        def write_map(entries, map_path):
+            with open(map_path, "w") as f:
+                json.dump([{"id": "CD1", "name": "hello"}], f)
+
+        mock_gen_map.side_effect = write_map
 
         request = SplitCodeRequest(
             content="def hello():\n    print('hello')\n",
@@ -304,15 +348,17 @@ class TestSplitCodeAPI:
         assert data["parts"][0]["id"] == "CD1"
         assert data["indexContent"] is not None
 
+    @patch("code2map.generators.map_generator.generate_map")
     @patch("code2map.generators.parts_generator.generate_parts")
     @patch("code2map.generators.index_generator.generate_index")
     @patch("code2map.utils.file_utils.read_lines")
     @patch("code2map.utils.file_utils.slice_lines")
     @patch("code2map.parsers.java_parser.JavaParser")
     def test_ut_spl_006_success_java(
-        self, mock_parser_cls, mock_slice, mock_read_lines, mock_gen_index, mock_gen_parts
+        self, mock_parser_cls, mock_slice, mock_read_lines, mock_gen_index, mock_gen_parts, mock_gen_map
     ):
         """UT-SPL-006: 正常系（Java）"""
+        import json
         import os
 
         # モッククラスシンボル
@@ -345,9 +391,12 @@ class TestSplitCodeAPI:
         mock_read_lines.return_value = java_code.split("\n")
         mock_slice.side_effect = [java_code, "public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }"]
 
-        # generate_partsがoutputディレクトリを作成する動作をシミュレート
+        # generate_partsがentriesを返す動作をシミュレート
+        mock_entries = [(mock_class, "PART-CD1.java"), (mock_method, "PART-CD2.java")]
+
         def create_output_dir(symbols, lines, out_dir):
             os.makedirs(out_dir, exist_ok=True)
+            return mock_entries
 
         mock_gen_parts.side_effect = create_output_dir
 
@@ -356,6 +405,13 @@ class TestSplitCodeAPI:
                 f.write("# CODE INDEX\n\n- CD1: HelloWorld (class)\n  - CD2: main (method)\n")
 
         mock_gen_index.side_effect = write_index
+
+        # generate_mapがMAP.jsonを書き込む動作をシミュレート
+        def write_map(entries, map_path):
+            with open(map_path, "w") as f:
+                json.dump([{"id": "CD1", "name": "HelloWorld"}, {"id": "CD2", "name": "main"}], f)
+
+        mock_gen_map.side_effect = write_map
 
         request = SplitCodeRequest(
             content=java_code,

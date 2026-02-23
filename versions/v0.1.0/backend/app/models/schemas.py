@@ -284,13 +284,16 @@ class SplitMarkdownRequest(BaseModel):
     content: str  # Markdownテキスト
     filename: str  # 元ファイル名
     maxDepth: int = Field(default=2, ge=1, le=6)  # 分割の見出しレベル (H1-H6)
+    splitMode: Literal["ai", "heading", "nlp"] = "ai"  # 分割モード
+    llmConfig: LLMConfig | None = None  # AIモード用LLM設定
 
 
 class DocumentPart(BaseModel):
     """分割された設計書パーツ"""
 
     id: str  # セクションID (MD1, MD2, ...)
-    section: str  # セクション名
+    section: str  # セクション名（title）
+    displayName: str  # 表示用名称（subsplit時はsubsplit_title）
     level: int  # 見出しレベル (1-6)
     path: str  # パス (親セクション > 子セクション)
     startLine: int
@@ -305,6 +308,7 @@ class SplitMarkdownResponse(BaseModel):
     success: bool
     parts: list[DocumentPart] = []
     indexContent: str | None = None  # INDEX.md相当の内容
+    mapJson: list[dict] | None = None  # md2map生成のMAP.json
     error: str | None = None
 
 
@@ -334,6 +338,7 @@ class SplitCodeResponse(BaseModel):
     success: bool
     parts: list[CodePart] = []
     indexContent: str | None = None  # INDEX.md相当の内容
+    mapJson: list[dict] | None = None  # code2map生成のMAP.json
     language: str | None = None  # 検出された言語
     error: str | None = None
 
