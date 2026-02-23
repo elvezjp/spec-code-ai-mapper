@@ -119,14 +119,6 @@ Open <http://localhost:5173> in your browser.
 
 ```text
 spec-code-ai-mapper/
-├── docker-compose.yml           # Docker Compose configuration
-├── Dockerfile.dev               # Development Dockerfile
-├── docker-entrypoint.sh         # Docker startup script
-├── ecosystem.config.js          # PM2 configuration (production)
-├── dev.ecosystem.config.js      # PM2 configuration (development)
-├── nginx/                       # Nginx configuration
-├── latest -> versions/v0.1.0    # Symlink (points to latest version)
-│
 ├── versions/                    # Version storage
 │   └── v0.1.0/                  # Latest version
 │       ├── backend/             # Python / FastAPI
@@ -135,8 +127,6 @@ spec-code-ai-mapper/
 │
 ├── docs/                        # Documentation
 │   └── structure-matching.md    # Structure matching details
-│
-├── scripts/                     # Utility scripts
 │
 ├── add-line-numbers/            # Subtree (elvezjp)
 ├── code2map/                    # Subtree (elvezjp)

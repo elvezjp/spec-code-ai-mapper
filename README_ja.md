@@ -119,14 +119,6 @@ npm run dev
 
 ```text
 spec-code-ai-mapper/
-├── docker-compose.yml           # Docker Compose設定
-├── Dockerfile.dev               # 開発用Dockerfile
-├── docker-entrypoint.sh         # Docker起動スクリプト
-├── ecosystem.config.js          # PM2設定（本番用）
-├── dev.ecosystem.config.js      # PM2設定（開発用）
-├── nginx/                       # Nginx設定
-├── latest -> versions/v0.1.0    # シンボリックリンク（最新版を指す）
-│
 ├── versions/                    # バージョン格納
 │   └── v0.1.0/                  # 最新版
 │       ├── backend/             # Python / FastAPI
@@ -135,8 +127,6 @@ spec-code-ai-mapper/
 │
 ├── docs/                        # ドキュメント
 │   └── structure-matching.md    # 構造マッチング機能の詳細
-│
-├── scripts/                     # ユーティリティスクリプト
 │
 ├── add-line-numbers/            # サブツリー（elvezjp）
 ├── code2map/                    # サブツリー（elvezjp）
