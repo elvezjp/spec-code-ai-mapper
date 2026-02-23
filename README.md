@@ -74,6 +74,13 @@ Results can be exported in Markdown format.
 
 ## Setup
 
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- [uv](https://docs.astral.sh/uv/) package manager
+- AWS account (with Bedrock access) or Anthropic/OpenAI API key
+
 ### Installation
 
 ```bash
@@ -169,9 +176,9 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## Background
 
-This tool was born during the development of **IXV (Ikushibu)**, an AI assistant for Japanese development documents and specifications.
+This tool was created as a small utility during the development of **IXV (Ixiv)**, a development support AI for Japanese development documents and specifications.
 
-IXV tackles the challenges of understanding, structuring, and utilizing Japanese documents in software development. This repository provides a standalone portion of that work as open source.
+IXV addresses the challenges of understanding, structuring, and utilizing Japanese documents in system development. This repository publishes a portion of that work.
 
 ## License
 

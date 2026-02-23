@@ -74,6 +74,13 @@ https://github.com/user-attachments/assets/48b9c0a0-3739-4486-8c4f-ac467c5b91e7
 
 ## セットアップ
 
+### 必要環境
+
+- Python 3.10 以上
+- Node.js 18 以上
+- [uv](https://docs.astral.sh/uv/) パッケージマネージャー
+- AWS アカウント（Bedrock へのアクセス権限）または Anthropic/OpenAI API キー
+
 ### インストール
 
 ```bash

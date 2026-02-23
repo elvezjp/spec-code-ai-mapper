@@ -85,8 +85,8 @@
 
 ```bash
 # フォークをクローン
-git clone https://github.com/YOUR-USERNAME/spec-code-ai-reviewer.git
-cd spec-code-ai-reviewer
+git clone https://github.com/YOUR-USERNAME/spec-code-ai-mapper.git
+cd spec-code-ai-mapper
 
 # バックエンドの依存関係をインストール
 cd versions/v0.1.0/backend
