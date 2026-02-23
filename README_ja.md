@@ -13,7 +13,7 @@
 
 AI マッパーは、設計書（Markdown/Excel）の各セクションと、ソースコード（Java/Python）のクラスやメソッドをAIが自動的にマッピングするツールです。大規模な開発プロジェクトにおいて、仕様がコードに正しく実装されているか、また修正がどの設計セクションに影響するかを瞬時に把握することを目的としています。
 
-https://github.com/user-attachments/assets/235aca23-ef13-4d25-b1a1-a7c085feb583
+https://github.com/user-attachments/assets/48b9c0a0-3739-4486-8c4f-ac467c5b91e7
 
 ## 特徴
 
@@ -107,26 +107,22 @@ npm run dev
    - 設計書（Excel）をアップロードし、「マークダウンに変換」を実行。
    - プログラム（ソースコード）をアップロードし、「add-line-numbersで変換」を実行。
 2. **分割設定**:
-   - 画面の「分割設定」で、設計書とコードを AI が解析しやすい単位に分割（プレビューで確認可能）。
-3. **AI マッピング実行**:
+   - 設計書: 一括 or 分割（見出しレベル H2/H3/H4）を選択。
+   - プログラム: 一括 or 分割を選択。
+   - プレビューで分割結果を確認可能。
+3. **マッピング方式の選択**:
+   - 標準 / 厳密 / 詳細 から選択。方式に応じてAIへのシステムプロンプトが切り替わります。
+4. **AI マッピング実行**:
    - ヘッダーの **「AI Mapper」** をクリックしてマッパー画面へ移動。
    - 「再マッチング実行」をクリックすると、AIが設計とコードの紐付けを開始します。
-4. **結果の確認・出力**:
+5. **結果の確認・出力**:
    - 生成されたトレーサビリティ・マトリクスを確認。
-   - 「Markdownでエクスポート」をクリックして、紐付け資料をダウンロード。
+   - ZIPで入出力データ一式（システムプロンプト、設計書MD、コード、結果）をダウンロード。
 
 ## ディレクトリ構成
 
 ```text
 spec-code-ai-mapper/
-├── docker-compose.yml           # Docker Compose設定
-├── Dockerfile.dev               # 開発用Dockerfile
-├── docker-entrypoint.sh         # Docker起動スクリプト
-├── ecosystem.config.js          # PM2設定（本番用）
-├── dev.ecosystem.config.js      # PM2設定（開発用）
-├── nginx/                       # Nginx設定
-├── latest -> versions/v0.1.0    # シンボリックリンク（最新版を指す）
-│
 ├── versions/                    # バージョン格納
 │   └── v0.1.0/                  # 最新版
 │       ├── backend/             # Python / FastAPI
@@ -135,8 +131,6 @@ spec-code-ai-mapper/
 │
 ├── docs/                        # ドキュメント
 │   └── structure-matching.md    # 構造マッチング機能の詳細
-│
-├── scripts/                     # ユーティリティスクリプト
 │
 ├── add-line-numbers/            # サブツリー（elvezjp）
 ├── code2map/                    # サブツリー（elvezjp）

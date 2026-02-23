@@ -13,7 +13,7 @@ A web application that uses AI to map design documents (Excel/Markdown) to progr
 
 AI Mapper is a tool that automatically maps sections of design documents (Markdown/Excel) to classes or methods in source code (Java/Python) using AI. In large-scale development projects, it helps you instantly understand whether specifications are correctly implemented in code and which design sections are affected by a change.
 
-https://github.com/user-attachments/assets/235aca23-ef13-4d25-b1a1-a7c085feb583
+https://github.com/user-attachments/assets/48b9c0a0-3739-4486-8c4f-ac467c5b91e7
 
 ## Features
 
@@ -107,26 +107,22 @@ Open <http://localhost:5173> in your browser.
    - Upload your design document (Excel) and click "Convert to Markdown".
    - Upload your program (source code) and click "Convert with add-line-numbers".
 2. **Split Settings**:
-   - In "Split Settings", choose units for AI analysis (you can check the preview).
-3. **Run AI Mapping**:
+   - Design documents: Choose bulk or split (heading level H2/H3/H4).
+   - Program code: Choose bulk or split.
+   - Preview the split results before proceeding.
+3. **Select Mapping Method**:
+   - Choose from Standard / Strict / Detailed. The system prompt sent to the AI changes based on the selected method.
+4. **Run AI Mapping**:
    - Click **"AI Mapper"** in the header to navigate to the Mapper screen.
    - Click "Run Re-matching" to start the AI mapping process.
-4. **View & Export**:
+5. **View & Export**:
    - Review the generated Traceability Matrix.
-   - Click "Export to Markdown" to download the traceability document.
+   - Download a ZIP archive containing all input/output data (system prompt, design document MD, code, results).
 
 ## Directory Structure
 
 ```text
 spec-code-ai-mapper/
-├── docker-compose.yml           # Docker Compose configuration
-├── Dockerfile.dev               # Development Dockerfile
-├── docker-entrypoint.sh         # Docker startup script
-├── ecosystem.config.js          # PM2 configuration (production)
-├── dev.ecosystem.config.js      # PM2 configuration (development)
-├── nginx/                       # Nginx configuration
-├── latest -> versions/v0.1.0    # Symlink (points to latest version)
-│
 ├── versions/                    # Version storage
 │   └── v0.1.0/                  # Latest version
 │       ├── backend/             # Python / FastAPI
@@ -135,8 +131,6 @@ spec-code-ai-mapper/
 │
 ├── docs/                        # Documentation
 │   └── structure-matching.md    # Structure matching details
-│
-├── scripts/                     # Utility scripts
 │
 ├── add-line-numbers/            # Subtree (elvezjp)
 ├── code2map/                    # Subtree (elvezjp)
