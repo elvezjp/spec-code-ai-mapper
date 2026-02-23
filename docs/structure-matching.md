@@ -16,12 +16,46 @@
 
 | コンポーネント | ファイル | 役割 |
 |---|---|---|
-| パーサー | [markdown_parser.py](../md2map/parsers/markdown_parser.py) | ATXスタイルの見出しを正規表現で解析。コードブロックやfrontmatterを考慮 |
-| Parts生成 | [parts_generator.py](../md2map/generators/parts_generator.py) | 各セクションを個別ファイルに出力（`<H1>_<H2>_<H3>.md`形式） |
-| Index生成 | [index_generator.py](../md2map/generators/index_generator.py) | 階層ツリー構造の `INDEX.md` を作成 |
-| Map生成 | [map_generator.py](../md2map/generators/map_generator.py) | `MAP.json` を生成（id, section, level, path, 行範囲, word count, SHA-256チェックサム） |
+| パーサー | [markdown_parser.py](../md2map/md2map/parsers/markdown_parser.py) | ATXスタイルの見出しを正規表現で解析。コードブロックやfrontmatterを考慮 |
+| Parts生成 | [parts_generator.py](../md2map/md2map/generators/parts_generator.py) | 各セクションを個別ファイルに出力（`<H1>_<H2>_<H3>.md`形式） |
+| Index生成 | [index_generator.py](../md2map/md2map/generators/index_generator.py) | 階層ツリー構造の `INDEX.md` を作成 |
+| Map生成 | [map_generator.py](../md2map/md2map/generators/map_generator.py) | `MAP.json` を生成（id, section, level, path, 行範囲, word count, SHA-256チェックサム） |
 
 各セクションには `MD1`, `MD2`, ... のIDが付与され、デフォルトの分割深度は **H2** です。
+
+### 分割モード
+
+md2map は3つの分割モードを提供します。`heading` モードがデフォルトです。`nlp`・`ai` モードでは、見出しベースの分割後に閾値（`--split-threshold`、デフォルト500）を超えるセクションを再分割し「サブスプリット」を挿入します。
+
+| モード | 概要 | 再分割の境界決定方法 |
+|---|---|---|
+| **heading** | 見出し階層のみで分割（デフォルト） | なし（再分割しない） |
+| **nlp** | 形態素解析で意味的境界を検出 | 隣接段落間の名詞 Jaccard 類似度が低い箇所 |
+| **ai** | LLM に行番号付きテキストを送信し分割とタイトル生成を委任 | LLM が返す行範囲グループとタイトル |
+
+#### heading モード
+
+追加依存なし。見出し（H1〜H6）の階層構造のみでセクションを分割します。シンプルで高速ですが、見出しのない長大なセクションはそのまま1つのセクションとして出力されます。
+
+#### nlp モード
+
+`sudachipy` + `sudachidict-core` が必要（`pip install md2map[nlp]`）。見出しベースで分割した後、閾値を超えるセクションに対して段落間の名詞 Jaccard 類似度を算出し、類似度が低い箇所（話題の転換点）で再分割します。日本語文書に適しています。
+
+#### ai モード
+
+LLMプロバイダーの認証情報が必要。見出しベースで分割した後、閾値を超えるセクションの内容を行番号付きでLLMに送信し、意味的に適切な分割位置とサブタイトルの生成を委任します。テーブルなど空行のない構造にも対応でき、最も柔軟な分割が可能です。
+
+| CLI オプション | 説明 | デフォルト |
+|---|---|---|
+| `--ai-provider` | AIプロバイダー（`openai` / `anthropic` / `bedrock`） | `bedrock` |
+| `--ai-model` | AIモデルID | プロバイダーごとのデフォルト |
+| `--ai-region` | Bedrock用リージョン | `ap-northeast-1` |
+
+| プロバイダー | 必要な認証情報 | デフォルトモデル |
+|---|---|---|
+| `openai` | `OPENAI_API_KEY` 環境変数 | `gpt-4o-mini` |
+| `anthropic` | `ANTHROPIC_API_KEY` 環境変数 | `claude-haiku-4-5-20251001` |
+| `bedrock` | AWS 認証情報（IAMロールまたは環境変数） | `global.anthropic.claude-haiku-4-5-20251001-v1:0` |
 
 ---
 

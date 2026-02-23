@@ -33,7 +33,7 @@ import type { MatchedGroup, MappingExecutionMeta, CodeLineMap } from './types'
 const APP_INFO = {
   name: 'spec-code-ai-mapper',
   version: 'v0.1.0',
-  description: 'spec-code-ai-mapper',
+  description: '設計書-Javaプログラム突合 AIマッパー',
   copyright: '© 株式会社エルブズ',
   url: 'https://elvez.co.jp',
 }
@@ -174,9 +174,10 @@ export function Reviewer() {
     await executeSplitPreview(
       specMarkdown,
       specFiles.find(f => f.isMain)?.filename || 'design.md',
-      codeFilesForSplit
+      codeFilesForSplit,
+      llmConfig || undefined
     )
-  }, [codeFiles, specMarkdown, specFiles, executeSplitPreview])
+  }, [codeFiles, specMarkdown, specFiles, executeSplitPreview, llmConfig])
 
 
   // Mapping execution
@@ -193,14 +194,7 @@ export function Reviewer() {
     try {
       const documentIndexMd = splitPreviewResult.documentIndex || ''
       const documentMapJson = {
-        sections: splitPreviewResult.documentParts?.map((p) => ({
-          id: p.id,
-          title: p.section,
-          level: p.level,
-          path: p.path,
-          startLine: p.startLine,
-          endLine: p.endLine,
-        })) || [],
+        sections: splitPreviewResult.documentMapJson || [],
       }
 
       const codeFileStructures = codeFiles.map((cf) => {
@@ -301,8 +295,14 @@ export function Reviewer() {
       specMarkdown,
       codeWithLineNumbers,
       codeLineMap,
+      splitData: splitPreviewResult ? {
+        documentIndex: splitPreviewResult.documentIndex || undefined,
+        documentMapJson: splitPreviewResult.documentMapJson || undefined,
+        codeIndex: splitPreviewResult.codeIndex || undefined,
+        codeMapJson: splitPreviewResult.codeMapJson || undefined,
+      } : undefined,
     })
-  }, [mappingResult, mappingMeta, mappingReportText, currentPromptValues, specMarkdown, codeWithLineNumbers, codeLineMap, downloadMappingZip])
+  }, [mappingResult, mappingMeta, mappingReportText, currentPromptValues, specMarkdown, codeWithLineNumbers, codeLineMap, splitPreviewResult, downloadMappingZip])
 
   const handleBackFromExecuting = useCallback(() => {
     setMappingError(null)

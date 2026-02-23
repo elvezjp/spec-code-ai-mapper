@@ -60,6 +60,8 @@ class TestStructureMatchingAPI:
 
         mock_provider = MagicMock()
         mock_provider.send_message.return_value = (mock_response, 100, 50)
+        mock_provider.model_id = "test-model"
+        mock_provider.provider_name = "test"
         mock_get_provider.return_value = mock_provider
 
         request = StructureMatchingRequest(
@@ -124,6 +126,8 @@ class TestStructureMatchingAPI:
 
         mock_provider = MagicMock()
         mock_provider.send_message.return_value = (mock_response, 200, 100)
+        mock_provider.model_id = "test-model"
+        mock_provider.provider_name = "test"
         mock_get_provider.return_value = mock_provider
 
         request = StructureMatchingRequest(

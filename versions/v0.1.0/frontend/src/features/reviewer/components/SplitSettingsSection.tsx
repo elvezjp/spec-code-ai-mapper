@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@core/index'
-import type { SplitSettings, DocumentPart, CodePart, SplitPreviewResult } from '../types'
+import type { SplitSettings, DocumentPart, CodePart, SplitPreviewResult, DocumentSplitMode } from '../types'
 
 interface SplitSettingsSectionProps {
   settings: SplitSettings
@@ -52,6 +52,10 @@ export function SplitSettingsSection({
     onSettingsChange({ ...settings, documentMaxDepth: depth })
   }, [settings, onSettingsChange])
 
+  const handleSplitModeChange = useCallback((mode: DocumentSplitMode) => {
+    onSettingsChange({ ...settings, documentSplitMode: mode })
+  }, [settings, onSettingsChange])
+
   const canExecutePreview = hasDesignDoc || hasCodeFiles
 
   // 対応言語を判定
@@ -95,6 +99,44 @@ export function SplitSettingsSection({
                   {' '}の仕様に準拠し、設定した見出しレベルで分割します。
                 </span>
               </p>
+              <div className="mb-3">
+                <span className="text-sm text-gray-600">分割モード:</span>
+                <div className="mt-1 space-y-1">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="splitMode"
+                      checked={settings.documentSplitMode === 'heading'}
+                      onChange={() => handleSplitModeChange('heading')}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="w-20 text-sm text-gray-700">見出し</span>
+                    <span className="text-xs text-gray-400">見出し（H2/H3等）の区切りで機械的に分割します</span>
+                  </label>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="splitMode"
+                      checked={settings.documentSplitMode === 'nlp'}
+                      onChange={() => handleSplitModeChange('nlp')}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="w-20 text-sm text-gray-700">NLP</span>
+                    <span className="text-xs text-gray-400">見出しに加えて自然言語処理で意味的な区切りを検出して分割します</span>
+                  </label>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="splitMode"
+                      checked={settings.documentSplitMode === 'ai'}
+                      onChange={() => handleSplitModeChange('ai')}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="w-20 text-sm text-gray-700">AI（推奨）</span>
+                    <span className="text-xs text-gray-400">見出しに加えてAIが文脈を考慮して適切に分割を行います。</span>
+                  </label>
+                </div>
+              </div>
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">見出しレベル:</span>
                 <label className="flex items-center gap-1 cursor-pointer">
@@ -161,7 +203,7 @@ export function SplitSettingsSection({
       </div>
 
       {/* 分割プレビュー実行ボタン */}
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-3">
         <button
           onClick={onExecutePreview}
           disabled={!canExecutePreview || isExecuting || !!previewResult}
@@ -178,6 +220,11 @@ export function SplitSettingsSection({
             '分割プレビュー実行'
           )}
         </button>
+        {settings.documentSplitMode === 'ai' && (
+          <span className="text-xs text-gray-400">
+            ※ 設計書が大きい場合は、処理に時間が掛かったり、タイムアウトや制限等でエラーになる可能性があります。
+          </span>
+        )}
       </div>
 
       {/* プレビュー結果 */}
@@ -241,7 +288,7 @@ function DocumentPartsTable({ parts }: { parts: DocumentPart[] }) {
           {parts.map((part, index) => (
             <TableRow key={`${part.section}-${part.startLine}`}>
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{part.section}</TableCell>
+              <TableCell>{part.displayName}</TableCell>
               <TableCell className="text-gray-600">L{part.startLine}-L{part.endLine}</TableCell>
               <TableCell className="text-gray-600">~{part.estimatedTokens.toLocaleString()}</TableCell>
             </TableRow>

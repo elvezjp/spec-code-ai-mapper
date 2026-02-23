@@ -10,6 +10,12 @@ interface MappingZipData {
   specMarkdown: string
   codeWithLineNumbers: string
   codeLineMap: CodeLineMap
+  splitData?: {
+    documentIndex?: string
+    documentMapJson?: Record<string, unknown>[]
+    codeIndex?: string
+    codeMapJson?: Record<string, unknown>[]
+  }
 }
 
 function formatCodeSymbol(cs: { id: string; filename: string; symbol: string }, codeLineMap?: CodeLineMap): string {
@@ -108,6 +114,10 @@ ${meta.outputTokens !== undefined ? `- 出力トークン: ${meta.outputTokens.t
 | code-numbered.txt | 行番号付きプログラム |
 | mapping-result-report.md | マッピング結果レポート（セクション形式 + テーブル形式） |
 | mapping-result.csv | マッピング結果一覧（CSV形式） |
+| split/spec-INDEX.md | 設計書の構造情報（md2map生成） |
+| split/spec-MAP.json | 設計書のセクションマップ（md2map生成） |
+| split/code-INDEX.md | プログラムの構造情報（code2map生成） |
+| split/code-MAP.json | プログラムのシンボルマップ（code2map生成） |
 `
 }
 
@@ -178,11 +188,28 @@ export function useZipExport(): UseZipExportReturn {
     zip.file('mapping-result-report.md', data.reportText)
     zip.file('mapping-result.csv', '\uFEFF' + buildTraceabilityCSV(data.mappingResult, data.codeLineMap))
 
+    if (data.splitData) {
+      if (data.splitData.documentIndex) {
+        zip.file('split/spec-INDEX.md', data.splitData.documentIndex)
+      }
+      if (data.splitData.documentMapJson) {
+        zip.file('split/spec-MAP.json', JSON.stringify(data.splitData.documentMapJson, null, 2))
+      }
+      if (data.splitData.codeIndex) {
+        zip.file('split/code-INDEX.md', data.splitData.codeIndex)
+      }
+      if (data.splitData.codeMapJson) {
+        zip.file('split/code-MAP.json', JSON.stringify(data.splitData.codeMapJson, null, 2))
+      }
+    }
+
     const blob = await zip.generateAsync({ type: 'blob' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `mapping-${data.executionMeta.executedAt.replace(/[: ]/g, '-')}.zip`
+    const dt = new Date(data.executionMeta.executedAt)
+    const ts = `${dt.getFullYear()}${String(dt.getMonth() + 1).padStart(2, '0')}${String(dt.getDate()).padStart(2, '0')}${String(dt.getHours()).padStart(2, '0')}${String(dt.getMinutes()).padStart(2, '0')}`
+    a.download = `${ts}-mapping-data.zip`
     a.click()
     URL.revokeObjectURL(url)
   }, [])
