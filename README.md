@@ -107,13 +107,17 @@ Open <http://localhost:5173> in your browser.
    - Upload your design document (Excel) and click "Convert to Markdown".
    - Upload your program (source code) and click "Convert with add-line-numbers".
 2. **Split Settings**:
-   - In "Split Settings", choose units for AI analysis (you can check the preview).
-3. **Run AI Mapping**:
+   - Design documents: Choose bulk or split (heading level H2/H3/H4).
+   - Program code: Choose bulk or split.
+   - Preview the split results before proceeding.
+3. **Select Mapping Method**:
+   - Choose from Standard / Strict / Detailed. The system prompt sent to the AI changes based on the selected method.
+4. **Run AI Mapping**:
    - Click **"AI Mapper"** in the header to navigate to the Mapper screen.
    - Click "Run Re-matching" to start the AI mapping process.
-4. **View & Export**:
+5. **View & Export**:
    - Review the generated Traceability Matrix.
-   - Click "Export to Markdown" to download the traceability document.
+   - Download a ZIP archive containing all input/output data (system prompt, design document MD, code, results).
 
 ## Directory Structure
 
