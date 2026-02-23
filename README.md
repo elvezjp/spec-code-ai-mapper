@@ -13,7 +13,7 @@ A web application that uses AI to map design documents (Excel/Markdown) to progr
 
 AI Mapper is a tool that automatically maps sections of design documents (Markdown/Excel) to classes or methods in source code (Java/Python) using AI. In large-scale development projects, it helps you instantly understand whether specifications are correctly implemented in code and which design sections are affected by a change.
 
-https://github.com/user-attachments/assets/235aca23-ef13-4d25-b1a1-a7c085feb583
+https://github.com/user-attachments/assets/48b9c0a0-3739-4486-8c4f-ac467c5b91e7
 
 ## Features
 
