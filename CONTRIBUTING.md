@@ -1,4 +1,4 @@
-# spec-code-ai-reviewer への貢献
+# spec-code-ai-mapper への貢献
 
 このドキュメントでは、プロジェクトへの貢献に関するガイドラインを説明します。
 
