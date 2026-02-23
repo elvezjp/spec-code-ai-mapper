@@ -42,7 +42,7 @@ Three mapping methods are available depending on your needs. The system prompt s
 |--------|-------------|
 | **Standard (LLM)** | LLM analyzes context and flexibly associates sections with code. |
 | **Strict (ID-based)** | Prioritizes matching by ID and symbol name. Suitable when traceability is well-defined. |
-| **Detailed (Content-aware)** | Increases accuracy by partially referencing section content (increases token consumption). |
+| **Detailed (Content-aware)** | Increases accuracy by partially referencing section content. |
 
 #### Output Format
 

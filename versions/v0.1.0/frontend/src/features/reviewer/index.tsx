@@ -33,7 +33,7 @@ import type { MatchedGroup, MappingExecutionMeta, CodeLineMap } from './types'
 const APP_INFO = {
   name: 'spec-code-ai-mapper',
   version: 'v0.1.0',
-  description: 'spec-code-ai-mapper',
+  description: '設計書-Javaプログラム突合 AIマッパー',
   copyright: '© 株式会社エルブズ',
   url: 'https://elvez.co.jp',
 }

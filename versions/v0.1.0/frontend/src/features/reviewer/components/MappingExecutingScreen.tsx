@@ -30,7 +30,7 @@ export function MappingExecutingScreen({
         {isExecuting && !error && (
           <>
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-6"></div>
-            <p className="text-gray-600 text-lg">AIが構造マッチングを実行中...</p>
+            <p className="text-gray-600 text-lg">AIがマッピングを実行中...</p>
             <p className="text-gray-400 mt-2">
               設計書とコードの対応関係を分析しています
             </p>

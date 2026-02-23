@@ -207,7 +207,9 @@ export function useZipExport(): UseZipExportReturn {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `mapping-${data.executionMeta.executedAt.replace(/[: ]/g, '-')}.zip`
+    const dt = new Date(data.executionMeta.executedAt)
+    const ts = `${dt.getFullYear()}${String(dt.getMonth() + 1).padStart(2, '0')}${String(dt.getDate()).padStart(2, '0')}${String(dt.getHours()).padStart(2, '0')}${String(dt.getMinutes()).padStart(2, '0')}`
+    a.download = `${ts}-mapping-data.zip`
     a.click()
     URL.revokeObjectURL(url)
   }, [])

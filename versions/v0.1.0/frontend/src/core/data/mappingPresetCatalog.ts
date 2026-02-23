@@ -96,7 +96,7 @@ export const MAPPING_PRESET_CATALOG: MappingPreset[] = [
   {
     id: 'detailed',
     name: '詳細 (内容参照)',
-    description: 'セクションの内容も一部参照して精度を高めます（トークン消費量が増えます）。',
+    description: 'セクションの内容も一部参照して精度を高めます。',
     systemPrompt: {
       role: BASE_ROLE,
       purpose: BASE_PURPOSE + '\n\n'
