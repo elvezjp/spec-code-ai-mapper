@@ -66,14 +66,14 @@ class TestSplitMarkdownAPI:
 
         # generate_indexがINDEX.mdを書き込む動作をシミュレート
         def write_index(sections, warnings, index_path, filename):
-            with open(index_path, "w") as f:
+            with open(index_path, "w", encoding="utf-8") as f:
                 f.write("# INDEX\n\n- MD1: 概要\n")
 
         mock_gen_index.side_effect = write_index
 
         # generate_mapがMAP.jsonを書き込む動作をシミュレート
         def write_map(sections, out_dir, map_path):
-            with open(map_path, "w") as f:
+            with open(map_path, "w", encoding="utf-8") as f:
                 json.dump([{"id": "MD1", "title": "概要"}], f)
             return True
 
@@ -144,13 +144,13 @@ class TestSplitMarkdownAPI:
         mock_gen_parts.side_effect = create_output_dir
 
         def write_index(sections, warnings, index_path, filename):
-            with open(index_path, "w") as f:
+            with open(index_path, "w", encoding="utf-8") as f:
                 f.write("# INDEX\n\n- MD1: 第1章\n- MD2: 1.1 概要\n")
 
         mock_gen_index.side_effect = write_index
 
         def write_map(sections, out_dir, map_path):
-            with open(map_path, "w") as f:
+            with open(map_path, "w", encoding="utf-8") as f:
                 json.dump([], f)
             return True
 
@@ -250,13 +250,13 @@ class TestSplitMarkdownAPI:
         mock_gen_parts.side_effect = create_output_dir
 
         def write_index(sections, warnings, index_path, filename):
-            with open(index_path, "w") as f:
+            with open(index_path, "w", encoding="utf-8") as f:
                 f.write("# INDEX\n")
 
         mock_gen_index.side_effect = write_index
 
         def write_map(sections, out_dir, map_path):
-            with open(map_path, "w") as f:
+            with open(map_path, "w", encoding="utf-8") as f:
                 json.dump([], f)
             return True
 
@@ -319,14 +319,14 @@ class TestSplitCodeAPI:
         mock_gen_parts.side_effect = create_output_dir
 
         def write_index(symbols, warnings, lines, index_path, filename):
-            with open(index_path, "w") as f:
+            with open(index_path, "w", encoding="utf-8") as f:
                 f.write("# CODE INDEX\n\n- CD1: hello (function)\n")
 
         mock_gen_index.side_effect = write_index
 
         # generate_mapがMAP.jsonを書き込む動作をシミュレート
         def write_map(entries, map_path):
-            with open(map_path, "w") as f:
+            with open(map_path, "w", encoding="utf-8") as f:
                 json.dump([{"id": "CD1", "name": "hello"}], f)
 
         mock_gen_map.side_effect = write_map
@@ -401,14 +401,14 @@ class TestSplitCodeAPI:
         mock_gen_parts.side_effect = create_output_dir
 
         def write_index(symbols, warnings, lines, index_path, filename):
-            with open(index_path, "w") as f:
+            with open(index_path, "w", encoding="utf-8") as f:
                 f.write("# CODE INDEX\n\n- CD1: HelloWorld (class)\n  - CD2: main (method)\n")
 
         mock_gen_index.side_effect = write_index
 
         # generate_mapがMAP.jsonを書き込む動作をシミュレート
         def write_map(entries, map_path):
-            with open(map_path, "w") as f:
+            with open(map_path, "w", encoding="utf-8") as f:
                 json.dump([{"id": "CD1", "name": "HelloWorld"}, {"id": "CD2", "name": "main"}], f)
 
         mock_gen_map.side_effect = write_map
