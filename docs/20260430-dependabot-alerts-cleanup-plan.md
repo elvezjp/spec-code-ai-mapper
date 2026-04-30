@@ -179,4 +179,4 @@ gh api repos/elvezjp/spec-code-ai-mapper/dependabot/alerts --paginate \
 |---|---|---|---|---|
 | Step 1（subtree dismiss） | 2026-04-30 | 30 / 30 | - | `dismissed_reason=not_used`。内訳: md2map 20件（root 6・versions/ v0.1.0 2・versions/v0.2.0 6・versions/v0.3.0 6）/ code2map 8件（root 2・versions/v0.1.1 2・versions/v0.1.2 2・versions/v0.1.3 2）/ excel2md 2件。残存 open: 10 件（最新版 v0.1.0 のみ） |
 | Step 2（最新版修正） | 2026-04-30 | 10 / 10 | - | backend は `uv.lock` を削除→`uv lock` で再生成。frontend は `package-lock.json` を削除→`npm install` で再生成（`npm audit`: 0 vulnerabilities）。主な更新: backend python-dotenv→1.2.2 / anthropic→0.97.0 / boto3→1.43.0 / urllib3→2.6.3 など。frontend vite→7.3.2（#46-48）/ rollup→4.60.2（#34）/ minimatch 3.1.5・10.2.5（#37,38）/ flatted→3.4.2（#40）/ picomatch→4.0.4（#43）/ yaml→1.10.3（#41）/ python-dotenv 修正で #49 解消。テスト: backend 166件・frontend 119件すべて成功。メジャー更新不要のため個別 issue 化なし |
-| Step 3（malware 確認） | - | - | - | 未実施 |
+| Step 3（malware 確認） | 2026-04-30 | 0 / 0 | - | `gh api dependabot/alerts` の全 49 件（open + dismissed）に対し `security_advisory.classification` をフィルタ。すべて `"general"`（脆弱性）で `"malware"` は該当なし。Malware タブの open アラートは 0 件のため対応不要 |
