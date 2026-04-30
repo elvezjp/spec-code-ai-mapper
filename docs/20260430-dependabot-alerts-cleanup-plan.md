@@ -177,6 +177,6 @@ gh api repos/elvezjp/spec-code-ai-mapper/dependabot/alerts --paginate \
 
 | Step | 実行日 | 件数 | 関連 PR / Issue | 備考 |
 |---|---|---|---|---|
-| Step 1（subtree dismiss） | - | 0 / 30 | - | 未実施 |
+| Step 1（subtree dismiss） | 2026-04-30 | 30 / 30 | - | `dismissed_reason=not_used`。内訳: md2map 20件（root 6・versions/ v0.1.0 2・versions/v0.2.0 6・versions/v0.3.0 6）/ code2map 8件（root 2・versions/v0.1.1 2・versions/v0.1.2 2・versions/v0.1.3 2）/ excel2md 2件。残存 open: 10 件（最新版 v0.1.0 のみ） |
 | Step 2（最新版修正） | - | 0 / 10 | - | 未実施 |
 | Step 3（malware 確認） | - | - | - | 未実施 |
