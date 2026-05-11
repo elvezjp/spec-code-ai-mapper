@@ -150,14 +150,14 @@ spec-code-ai-mapper/
 
 ## ドキュメント
 
-- [CHANGELOG.md](CHANGELOG.md) - 変更履歴
-- [CONTRIBUTING.md](CONTRIBUTING.md) - コントリビューション方法
-- [SECURITY.md](SECURITY.md) - セキュリティポリシー
+- [CHANGELOG_ja.md](CHANGELOG_ja.md) - 変更履歴
+- [CONTRIBUTING_ja.md](CONTRIBUTING_ja.md) - コントリビューション方法
+- [SECURITY_ja.md](SECURITY_ja.md) - セキュリティポリシー
 - [構造マッチング機能の詳細](docs/structure-matching.md) - AI マッピングと構造マッチングの技術詳細
 
 ## セキュリティ
 
-セキュリティに関する詳細は [SECURITY.md](SECURITY.md) を参照してください。
+セキュリティに関する詳細は [SECURITY_ja.md](SECURITY_ja.md) を参照してください。
 
 - ファイル処理時のセキュリティ対策（Excel ファイルの `read_only=True` モード使用、ファイルサイズ制限など）
 - API キーは環境変数で管理し、コードにハードコードしないことを推奨
@@ -192,7 +192,7 @@ Dismiss したアラートは「同一 manifest × 同一パッケージ × 同�
 
 ## コントリビューション
 
-コントリビューションを歓迎します。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+コントリビューションを歓迎します。詳細は [CONTRIBUTING_ja.md](CONTRIBUTING_ja.md) を参照してください。
 
 - バグ報告や機能改善の提案は GitHub Issue で受け付けています
 - プルリクエストは `main` ブランチに対して作成してください
@@ -200,7 +200,7 @@ Dismiss したアラートは「同一 manifest × 同一パッケージ × 同�
 
 ## 変更履歴
 
-詳細は [CHANGELOG.md](CHANGELOG.md) を参照してください。
+詳細は [CHANGELOG_ja.md](CHANGELOG_ja.md) を参照してください。
 
 ## 開発の背景
 

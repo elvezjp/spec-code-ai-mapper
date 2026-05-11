@@ -1,45 +1,58 @@
-# 変更履歴
+# Changelog
 
-このプロジェクトに対するすべての重要な変更はこのファイルに記録されます。
+[English](./CHANGELOG.md) | [日本語](./CHANGELOG_ja.md)
 
-フォーマットは [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) に基づいており、
-このプロジェクトは [セマンティックバージョニング](https://semver.org/spec/v2.0.0.html) に準拠しています。
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.1] - 2026-05-11
 
-### 変更
-- **excel2md subtree を v2.0 → v2.1.1 に更新**
-  - upstream: [elvezjp/excel2md PR #31](https://github.com/elvezjp/excel2md/pull/31)
-  - `versions/v0.1.1/backend/app/markdown_tools/excel2md_tool.py` の `_DEFAULT_EXCEL2MD_PATH` を `excel2md/v2.1.1` に切り替え
-  - 取り込まれる upstream の主な修正:
-    - 複数テーブル間で脚注番号が重複する不具合の修正（excel2md issue #25）
-    - `extract_table()` 打ち切りパスの tuple アリティ不整合の修正（excel2md issue #24）
-    - `is_code_block` / `build_code_block_from_rows` の v1.x 互換 re-export を復元（excel2md issue #15）
-    - `footnote_scope=sheet` × 非 `--split-by-sheet` 時に sheet スコープ脚注定義が出力されない不具合の修正
-    - `mermaid_generator.py` の `is_code_block` import 漏れ修正（v2.0.1, excel2md issue #13）
-    - 最低 Python バージョンを 3.10 に引き上げ、pytest / Pygments のセキュリティ更新（v2.1.0）
+### Changed
+- **Updated excel2md subtree from v2.0 to v2.1.1**
+  - Upstream: [elvezjp/excel2md PR #31](https://github.com/elvezjp/excel2md/pull/31)
+  - Switched `_DEFAULT_EXCEL2MD_PATH` in `versions/v0.1.1/backend/app/markdown_tools/excel2md_tool.py` to `excel2md/v2.1.1`
+  - Upstream fixes included:
+    - Fixed duplicated footnote numbering across multiple tables (excel2md issue #25)
+    - Fixed inconsistent return arity from `extract_table()` on truncation path (excel2md issue #24)
+    - Restored backward-compatible re-exports of `is_code_block` / `build_code_block_from_rows` (excel2md issue #15)
+    - Fixed sheet-scope footnote definitions being dropped in non-`--split-by-sheet` mode
+    - Fixed missing `is_code_block` import in `mermaid_generator.py` (v2.0.1, excel2md issue #13)
+    - Raised minimum Python version to 3.10 and applied pytest / Pygments security updates (v2.1.0)
 
-### 互換性
-- `versions/v0.1.0/` は凍結スナップショットとして保持し、v0.1.1 はそのコピーをベースに修正。
+### Documentation
+
+- Bilingual OSS documentation at the repository root: added `README_ja.md`, `CHANGELOG_ja.md`, `CONTRIBUTING_ja.md`, and `SECURITY_ja.md`; refreshed English counterparts and cross-links for public release ([PR #12](https://github.com/elvezjp/spec-code-ai-mapper/pull/12)).
+
+### Compatibility
+- `versions/v0.1.0/` is preserved as a frozen snapshot. v0.1.1 is a copy of it with the changes above applied.
 
 ## [0.1.0] - 2026-02-13
 
-[spec-code-ai-reviewer](https://github.com/elvezjp/spec-code-ai-reviewer) をベースに、設計書-コード間のトレーサビリティ管理に特化したツールとして新規作成。
+Initial release. Created as a new tool specialized in design-document-to-code traceability management, based on [spec-code-ai-reviewer](https://github.com/elvezjp/spec-code-ai-reviewer).
 
-### 追加
-- **トレーサビリティ・マトリクス生成**: 設計書セクションとコードシンボルの紐付けをAIで自動マッピングし、一覧表示
-- **構造マッチング**: md2map/code2mapを使用したセマンティック分割と構造ベースのマッチング
-- **3つのマッピング方式**: 標準（LLM）、厳密（ID重視）、詳細（内容参照）の選択式
-- **結果エクスポート**: Markdown形式でのトレーサビリティ・マトリクス出力
-- **設計書・コード変換**: Excel→Markdown変換（MarkItDown/excel2md）、コード→行番号付与（add-line-numbers）
-- **セマンティック分割**: 大規模ファイルを意味のある単位に分割してAIが処理可能なサイズで精密マッピング
-- **マルチLLMプロバイダー対応**: Bedrock / Anthropic / OpenAI を切り替えて実行可能
-- **フロントエンド**: Vite + React + TypeScript + Tailwind CSS によるモダンSPA
+### Added
+- **Traceability Matrix Generation**: AI-driven automatic mapping between design document sections and code symbols, presented as a list.
+- **Structure Matching**: Semantic splitting and structure-based matching using md2map / code2map.
+- **Three Mapping Methods**: Standard (LLM), Strict (ID-based), and Detailed (content-aware) — selectable.
+- **Result Export**: Traceability matrix output in Markdown format.
+- **Spec / Code Conversion**: Excel → Markdown conversion (MarkItDown / excel2md), code → line-numbered text (add-line-numbers).
+- **Semantic Splitting**: Splits large files into meaningful units so the AI can perform precise mapping within token limits.
+- **Multi-LLM Provider Support**: Switchable execution across Bedrock / Anthropic / OpenAI.
+- **Frontend**: A modern SPA built with Vite + React + TypeScript + Tailwind CSS.
 
 ---
 
-## リンク
+## Links
 
-- [リポジトリ](https://github.com/elvezjp/spec-code-ai-mapper)
-- [Issue](https://github.com/elvezjp/spec-code-ai-mapper/issues)
-- [ベースプロジェクト](https://github.com/elvezjp/spec-code-ai-reviewer)
+- [Repository](https://github.com/elvezjp/spec-code-ai-mapper)
+- [Issues](https://github.com/elvezjp/spec-code-ai-mapper/issues)
+- [Base project](https://github.com/elvezjp/spec-code-ai-reviewer)
+
+## Version Comparison
+
+| Version | Highlights |
+| ------- | ---------- |
+| 0.1.1 | excel2md subtree v2.1.1; bilingual root docs (README / CHANGELOG / CONTRIBUTING / SECURITY); current security-supported release |
+| 0.1.0 | Initial MVP: traceability matrix, structure matching (`md2map` / `code2map`), three mapping modes, Markdown export, multi-LLM support, Vite + React frontend |
