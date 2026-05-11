@@ -5,6 +5,23 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/spec/v2.0.0.html) に準拠しています。
 
+## [0.1.1] - 2026-05-11
+
+### 変更
+- **excel2md subtree を v2.0 → v2.1.1 に更新**
+  - upstream: [elvezjp/excel2md PR #31](https://github.com/elvezjp/excel2md/pull/31)
+  - `versions/v0.1.1/backend/app/markdown_tools/excel2md_tool.py` の `_DEFAULT_EXCEL2MD_PATH` を `excel2md/v2.1.1` に切り替え
+  - 取り込まれる upstream の主な修正:
+    - 複数テーブル間で脚注番号が重複する不具合の修正（excel2md issue #25）
+    - `extract_table()` 打ち切りパスの tuple アリティ不整合の修正（excel2md issue #24）
+    - `is_code_block` / `build_code_block_from_rows` の v1.x 互換 re-export を復元（excel2md issue #15）
+    - `footnote_scope=sheet` × 非 `--split-by-sheet` 時に sheet スコープ脚注定義が出力されない不具合の修正
+    - `mermaid_generator.py` の `is_code_block` import 漏れ修正（v2.0.1, excel2md issue #13）
+    - 最低 Python バージョンを 3.10 に引き上げ、pytest / Pygments のセキュリティ更新（v2.1.0）
+
+### 互換性
+- `versions/v0.1.0/` は凍結スナップショットとして保持し、v0.1.1 はそのコピーをベースに修正。
+
 ## [0.1.0] - 2026-02-13
 
 [spec-code-ai-reviewer](https://github.com/elvezjp/spec-code-ai-reviewer) をベースに、設計書-コード間のトレーサビリティ管理に特化したツールとして新規作成。

@@ -93,7 +93,7 @@ cd spec-code-ai-mapper
 **Backend**
 
 ```bash
-cd versions/v0.1.0/backend
+cd versions/v0.1.1/backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -101,7 +101,7 @@ uv run uvicorn app.main:app --reload --port 8000
 **Frontend**
 
 ```bash
-cd versions/v0.1.0/frontend
+cd versions/v0.1.1/frontend
 npm install
 npm run dev
 ```
@@ -131,7 +131,8 @@ Open <http://localhost:5173> in your browser.
 ```text
 spec-code-ai-mapper/
 ├── versions/                    # Version storage
-│   └── v0.1.0/                  # Latest version
+│   ├── v0.1.0/                  # Initial release
+│   └── v0.1.1/                  # Latest version (excel2md v2.1.1)
 │       ├── backend/             # Python / FastAPI
 │       ├── frontend/            # Vite + React + TypeScript
 │       └── spec.md              # Specification document
