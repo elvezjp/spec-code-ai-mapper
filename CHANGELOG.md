@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Fixed missing `is_code_block` import in `mermaid_generator.py` (v2.0.1, excel2md issue #13)
     - Raised minimum Python version to 3.10 and applied pytest / Pygments security updates (v2.1.0)
 
+### Documentation
+
+- Bilingual OSS documentation at the repository root: added `README_ja.md`, `CHANGELOG_ja.md`, `CONTRIBUTING_ja.md`, and `SECURITY_ja.md`; refreshed English counterparts and cross-links for public release ([PR #12](https://github.com/elvezjp/spec-code-ai-mapper/pull/12)).
+
 ### Compatibility
 - `versions/v0.1.0/` is preserved as a frozen snapshot. v0.1.1 is a copy of it with the changes above applied.
 
@@ -45,3 +49,10 @@ Initial release. Created as a new tool specialized in design-document-to-code tr
 - [Repository](https://github.com/elvezjp/spec-code-ai-mapper)
 - [Issues](https://github.com/elvezjp/spec-code-ai-mapper/issues)
 - [Base project](https://github.com/elvezjp/spec-code-ai-reviewer)
+
+## Version Comparison
+
+| Version | Highlights |
+| ------- | ---------- |
+| 0.1.1 | excel2md subtree v2.1.1; bilingual root docs (README / CHANGELOG / CONTRIBUTING / SECURITY); current security-supported release |
+| 0.1.0 | Initial MVP: traceability matrix, structure matching (`md2map` / `code2map`), three mapping modes, Markdown export, multi-LLM support, Vite + React frontend |
