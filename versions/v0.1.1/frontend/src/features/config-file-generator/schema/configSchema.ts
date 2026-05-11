@@ -4,7 +4,7 @@ export const CONFIG_SCHEMA: ConfigSchema = {
   meta: {
     outputTitle: '設計書-Javaプログラム突合 AIマッパー 設定ファイル',
     outputFileName: 'mapper-config.md',
-    version: 'v0.1.0',
+    version: 'v0.1.1',
   },
   sections: [
     {
@@ -17,7 +17,7 @@ export const CONFIG_SCHEMA: ConfigSchema = {
           id: 'version',
           label: 'version',
           type: 'fixed',
-          value: 'v0.1.0',
+          value: 'v0.1.1',
         },
         {
           id: 'created_at',
