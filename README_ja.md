@@ -93,7 +93,7 @@ cd spec-code-ai-mapper
 **バックエンド**
 
 ```bash
-cd versions/v0.1.0/backend
+cd versions/v0.1.1/backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -101,7 +101,7 @@ uv run uvicorn app.main:app --reload --port 8000
 **フロントエンド**
 
 ```bash
-cd versions/v0.1.0/frontend
+cd versions/v0.1.1/frontend
 npm install
 npm run dev
 ```
@@ -131,7 +131,8 @@ npm run dev
 ```text
 spec-code-ai-mapper/
 ├── versions/                    # バージョン格納
-│   └── v0.1.0/                  # 最新版
+│   ├── v0.1.0/                  # 初版
+│   └── v0.1.1/                  # 最新版（excel2md v2.1.1）
 │       ├── backend/             # Python / FastAPI
 │       ├── frontend/            # Vite + React + TypeScript
 │       └── spec.md              # 仕様書
