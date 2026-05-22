@@ -7,6 +7,20 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
+## [0.1.2] - 2026-05-22
+
+### セキュリティ
+- **[SECURITY] `idna` を 3.14 → 3.16 に更新**: Dependabot アラート [#66](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/66)（GHSA-65pc-fj4g-8rjx, `idna < 3.15`）を解消。
+
+### 変更
+- **Python 最小要件を 3.10 → 3.11 に引き上げ**: 依存先（`add-line-numbers`、`md2map`、`code2map`）の最新 main が Python >=3.11 を要求するようになり、3.10 では `uv lock` が解決できないため、`versions/v0.1.2/backend/pyproject.toml` の `requires-python` を更新。
+
+### 修正
+- `/health` エンドポイントをフロントエンド静的ファイル配信より前に登録し、ヘルスチェック応答を正しく返すように修正。
+
+### 互換性
+- `versions/v0.1.1/` は凍結スナップショットとして保持し、v0.1.2 はそのコピーをベースに上記の修正を適用。
+
 ## [0.1.1] - 2026-05-11
 
 ### 変更
@@ -54,5 +68,6 @@
 
 | バージョン | 主な内容 |
 | ---------- | -------- |
-| 0.1.1 | excel2md subtree v2.1.1 へ更新; ルート配下の日英 OSS 文書（README／CHANGELOG／CONTRIBUTING／SECURITY）; セキュリティサポート対象の現行版 |
+| 0.1.2 | Python 最小要件を 3.11 に引き上げ; `idna` を 3.16 に更新（Dependabot #66 解消）; セキュリティサポート対象の現行版 |
+| 0.1.1 | excel2md subtree v2.1.1 へ更新; ルート配下の日英 OSS 文書（README／CHANGELOG／CONTRIBUTING／SECURITY） |
 | 0.1.0 | 初回リリース: トレーサビリティ・マトリクス、構造マッチング（md2map/code2map）、3 方式マッチング、Markdown 出力、マルチ LLM、Vite + React フロントエンド |

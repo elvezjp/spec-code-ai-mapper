@@ -7,6 +7,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-05-22
+
+### Security
+- **[SECURITY] Bumped `idna` from 3.14 to 3.16** to resolve Dependabot alert [#66](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/66) (GHSA-65pc-fj4g-8rjx, `idna < 3.15`).
+
+### Changed
+- **Raised the minimum Python version from 3.10 to 3.11** in `versions/v0.1.2/backend/pyproject.toml`. The latest `main` branches of dependencies (`add-line-numbers`, `md2map`, `code2map`) now require Python >=3.11, and `uv lock` no longer resolves on 3.10.
+
+### Fixed
+- Fixed the `/health` endpoint so it is registered before the frontend static file mount and returns a proper health-check response.
+
+### Compatibility
+- `versions/v0.1.1/` is preserved as a frozen snapshot. v0.1.2 is a copy of it with the changes above applied.
+
 ## [0.1.1] - 2026-05-11
 
 ### Changed
@@ -54,5 +68,6 @@ Initial release. Created as a new tool specialized in design-document-to-code tr
 
 | Version | Highlights |
 | ------- | ---------- |
-| 0.1.1 | excel2md subtree v2.1.1; bilingual root docs (README / CHANGELOG / CONTRIBUTING / SECURITY); current security-supported release |
+| 0.1.2 | Bumped minimum Python to 3.11; updated `idna` to 3.16 (Dependabot #66 resolved); current security-supported release |
+| 0.1.1 | excel2md subtree v2.1.1; bilingual root docs (README / CHANGELOG / CONTRIBUTING / SECURITY) |
 | 0.1.0 | Initial MVP: traceability matrix, structure matching (`md2map` / `code2map`), three mapping modes, Markdown export, multi-LLM support, Vite + React frontend |

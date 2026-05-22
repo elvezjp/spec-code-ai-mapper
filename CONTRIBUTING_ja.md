@@ -43,14 +43,14 @@
 3. 変更に対する**テストを作成**
    ```bash
    # バックエンドのテストを実行
-   cd versions/v0.1.1/backend
+   cd versions/v0.1.2/backend
    uv run pytest tests/ -v
 
    # バックエンドのカバレッジ付きテスト
    uv run pytest tests/ --cov=app --cov-report=html
 
    # フロントエンドのテストを実行
-   cd versions/v0.1.1/frontend
+   cd versions/v0.1.2/frontend
    npm run test:run
 
    # フロントエンドのカバレッジ付きテスト
@@ -78,7 +78,7 @@
 
 ### 前提条件
 
-- Python 3.10 以上
+- Python 3.11 以上
 - Node.js 18 以上
 - [uv](https://docs.astral.sh/uv/) パッケージマネージャー
 - AWS アカウント（Bedrock へのアクセス権限）または Anthropic/OpenAI API キー
@@ -91,7 +91,7 @@ git clone https://github.com/YOUR-USERNAME/spec-code-ai-mapper.git
 cd spec-code-ai-mapper
 
 # バックエンドの依存関係をインストール
-cd versions/v0.1.1/backend
+cd versions/v0.1.2/backend
 uv sync
 
 # フロントエンドの依存関係をインストール
@@ -103,7 +103,7 @@ npm install
 
 ```bash
 # バックエンド：すべてのテストを実行
-cd versions/v0.1.1/backend
+cd versions/v0.1.2/backend
 uv run pytest tests/ -v
 
 # バックエンド：特定のテストファイルを実行
@@ -113,7 +113,7 @@ uv run pytest tests/test_convert.py -v
 uv run pytest tests/ --cov=app --cov-report=html
 
 # フロントエンド：すべてのテストを実行
-cd versions/v0.1.1/frontend
+cd versions/v0.1.2/frontend
 npm run test:run
 
 # フロントエンド：ウォッチモードでテストを実行

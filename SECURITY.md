@@ -8,8 +8,8 @@ We support the latest version:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.1   | :white_check_mark: |
-| < 0.1.1 | :x:                |
+| 0.1.2   | :white_check_mark: |
+| < 0.1.2 | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -18,9 +18,8 @@ If you discover a security vulnerability in spec-code-ai-mapper, please follow t
 ### How to Report
 
 1. **Do NOT** open a public GitHub issue for security vulnerabilities
-2. Send a detailed report to the maintainers via one of the following channels:
-   - Open a GitHub private security advisory (recommended)
-   - For lower-severity issues, open an issue with the "security" label
+2. Open a GitHub private security advisory for this repository (recommended)
+3. If you cannot use private security advisories, contact the maintainers directly with a detailed report
 
 ### What to Include
 

@@ -5,7 +5,7 @@
 [![Elvez](https://img.shields.io/badge/Elvez-Product-3F61A7?style=flat-square)](https://elvez.co.jp/)
 [![IXV Ecosystem](https://img.shields.io/badge/IXV-Ecosystem-3F61A7?style=flat-square)](https://elvez.co.jp/ixv/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Stars](https://img.shields.io/github/stars/elvezjp/spec-code-ai-mapper?style=social)](https://github.com/elvezjp/spec-code-ai-mapper/stargazers)
 
@@ -76,7 +76,7 @@ https://github.com/user-attachments/assets/48b9c0a0-3739-4486-8c4f-ac467c5b91e7
 
 ### 必要環境
 
-- Python 3.10 以上
+- Python 3.11 以上
 - Node.js 18 以上
 - [uv](https://docs.astral.sh/uv/) パッケージマネージャー
 - AWS アカウント（Bedrock へのアクセス権限）または Anthropic/OpenAI API キー
@@ -93,7 +93,7 @@ cd spec-code-ai-mapper
 **バックエンド**
 
 ```bash
-cd versions/v0.1.1/backend
+cd versions/v0.1.2/backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -101,7 +101,7 @@ uv run uvicorn app.main:app --reload --port 8000
 **フロントエンド**
 
 ```bash
-cd versions/v0.1.1/frontend
+cd versions/v0.1.2/frontend
 npm install
 npm run dev
 ```
@@ -132,7 +132,8 @@ npm run dev
 spec-code-ai-mapper/
 ├── versions/                    # バージョン格納
 │   ├── v0.1.0/                  # 初版
-│   └── v0.1.1/                  # 最新版（excel2md v2.1.1）
+│   ├── v0.1.1/                  # excel2md v2.1.1
+│   └── v0.1.2/                  # 最新版（Python 3.11+、idna 3.16）
 │       ├── backend/             # Python / FastAPI
 │       ├── frontend/            # Vite + React + TypeScript
 │       └── spec.md              # 仕様書
