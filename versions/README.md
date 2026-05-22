@@ -9,11 +9,18 @@
 ```
 versions/
 ├── v0.1.0/    # 初版 (AI Mapper)
-├── v0.1.1/    # excel2md v2.1.1 取り込み（最新）
+├── v0.1.1/    # excel2md v2.1.1 取り込み
+├── v0.1.2/    # Python 3.11 へ引き上げ、idna 3.16 取り込み（最新）
 └── README.md  # このファイル
 ```
 
 ## 更新履歴
+
+### v0.1.2 (2026-05-22)
+
+- **Python 最小要件を 3.10 → 3.11 に引き上げ**: 依存先（`add-line-numbers` / `md2map` / `code2map`）の最新 main が Python >=3.11 を要求するため。
+- **`idna` を 3.14 → 3.16 に更新**: Dependabot アラート [#66](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/66)（GHSA-65pc-fj4g-8rjx）を解消。
+- `versions/v0.1.1/` は凍結スナップショットとして保持。
 
 ### v0.1.1 (2026-05-11)
 
