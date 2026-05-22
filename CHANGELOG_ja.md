@@ -15,6 +15,9 @@
 ### 変更
 - **Python 最小要件を 3.10 → 3.11 に引き上げ**: 依存先（`add-line-numbers`、`md2map`、`code2map`）の最新 main が Python >=3.11 を要求するようになり、3.10 では `uv lock` が解決できないため、`versions/v0.1.2/backend/pyproject.toml` の `requires-python` を更新。
 
+### 修正
+- `/health` エンドポイントをフロントエンド静的ファイル配信より前に登録し、ヘルスチェック応答を正しく返すように修正。
+
 ### 互換性
 - `versions/v0.1.1/` は凍結スナップショットとして保持し、v0.1.2 はそのコピーをベースに上記の修正を適用。
 

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Raised the minimum Python version from 3.10 to 3.11** in `versions/v0.1.2/backend/pyproject.toml`. The latest `main` branches of dependencies (`add-line-numbers`, `md2map`, `code2map`) now require Python >=3.11, and `uv lock` no longer resolves on 3.10.
 
+### Fixed
+- Fixed the `/health` endpoint so it is registered before the frontend static file mount and returns a proper health-check response.
+
 ### Compatibility
 - `versions/v0.1.1/` is preserved as a frozen snapshot. v0.1.2 is a copy of it with the changes above applied.
 
