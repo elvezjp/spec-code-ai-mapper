@@ -8,7 +8,7 @@ from pathlib import Path
 from .base import MarkdownTool
 
 # excel2mdモジュールへのパス（環境変数でオーバーライド可能）
-# パス構造: excel2md_tool.py -> markdown_tools -> app -> backend -> v0.1.1 -> versions -> repo_root
+# パス構造: excel2md_tool.py -> markdown_tools -> app -> backend -> v0.1.2 -> versions -> repo_root
 # NOTE: このパスはexcel2md_mermaid_tool.pyからもインポートされて使用される
 _DEFAULT_EXCEL2MD_PATH = (
     Path(__file__).resolve().parent.parent.parent.parent.parent.parent
