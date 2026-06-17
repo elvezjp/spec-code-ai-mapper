@@ -7,9 +7,10 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
-## [0.1.2] - 2026-05-22
+## [0.1.2] - 2026-06-17
 
 ### セキュリティ
+- **[SECURITY] `starlette` を 1.0.1 → 1.3.1 に更新**: Dependabot アラート [#121](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/121) / [#122](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/122) / [#123](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/123) / [#124](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/124)（`starlette < 1.3.1` ほか）を解消。あわせて `uv.lock` を再生成。
 - **[SECURITY] `idna` を 3.14 → 3.16 に更新**: Dependabot アラート [#66](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/66)（GHSA-65pc-fj4g-8rjx, `idna < 3.15`）を解消。
 
 ### 変更

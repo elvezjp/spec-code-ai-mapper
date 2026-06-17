@@ -7,9 +7,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.2] - 2026-05-22
+## [0.1.2] - 2026-06-17
 
 ### Security
+- **[SECURITY] Bumped `starlette` from 1.0.1 to 1.3.1** to resolve Dependabot alerts [#121](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/121) / [#122](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/122) / [#123](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/123) / [#124](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/124) (`starlette < 1.3.1` and related). Also regenerated `uv.lock`.
 - **[SECURITY] Bumped `idna` from 3.14 to 3.16** to resolve Dependabot alert [#66](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/66) (GHSA-65pc-fj4g-8rjx, `idna < 3.15`).
 
 ### Changed
