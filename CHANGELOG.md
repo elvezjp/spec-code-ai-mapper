@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - Unreleased
+
+### Security
+- **[SECURITY] Fixed a path traversal in unauthenticated APIs that allowed arbitrary file writes** (GHSA-f63v-8r92-h4r7): `POST /api/split/markdown`, `POST /api/split/code`, and `POST /api/convert/excel-to-markdown` joined the client-supplied filename directly into a temporary directory path, so absolute paths or `../` sequences could create or overwrite files outside the temporary directory. Client-supplied filenames are now sanitized with `safe_filename()` (added in `versions/v0.1.2/backend/app/safe_path.py`), which strips directory components, with regression tests. Note: `versions/v0.1.0` / `versions/v0.1.1` share the same flaw but are frozen snapshots and out of scope (the `versions/` layout is scheduled for removal)
+- **[SECURITY] Updated frontend dependencies to resolve Dependabot alerts** (#24): Bumped `react-router-dom` 7.17.0 → 7.18.2 to resolve alerts [#136](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/136) / [#145](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/145) / [#148](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/148) (XSS, route-matching DoS, constructor injection), and updated the transitive dev dependencies `js-yaml` 4.2.0 → 4.3.0 (alert [#141](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/141)) and `brace-expansion` → 1.1.16 / 5.0.8 (alert [#133](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/133)), both CPU-consumption DoS. Also preemptively bumped `postcss` 8.5.15 → 8.5.24 (GHSA-r28c-9q8g-f849, arbitrary `.map` file disclosure). Alert [#142](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/142) (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) was dismissed as not applicable — the unstable RSC APIs are not used and no 7.x patch exists; alerts [#149](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/149) / [#150](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/150) on the frozen snapshots `versions/v0.1.0` / `versions/v0.1.1` were dismissed as out of scope
+
 ## [0.1.2] - 2026-06-17
 
 ### Security

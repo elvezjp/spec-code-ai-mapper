@@ -7,6 +7,12 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
+## [0.2.0] - Unreleased
+
+### セキュリティ
+- **[SECURITY] 認証なし API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-f63v-8r92-h4r7）: `POST /api/split/markdown` / `POST /api/split/code` / `POST /api/convert/excel-to-markdown` がクライアント指定のファイル名を一時ディレクトリのパスへそのまま結合していたため、絶対パスや `../` を含む値で一時ディレクトリ外にファイルを作成・上書きできた。クライアント由来のファイル名は `safe_filename()`（`versions/v0.1.2/backend/app/safe_path.py` に追加）でディレクトリ成分を除去してから使用するよう修正し、回帰テストを追加。注: `versions/v0.1.0` / `versions/v0.1.1` にも同一の欠陥があるが、凍結スナップショットのため修正対象外（`versions/` レイアウトは廃止予定）
+- **[SECURITY] フロントエンド依存関係を更新し Dependabot アラートを解消**（#24）: `react-router-dom` を 7.17.0 → 7.18.2 に更新してアラート [#136](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/136) / [#145](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/145) / [#148](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/148)（XSS、ルートマッチング DoS、コンストラクタインジェクション）を解消。あわせて推移的な開発依存 `js-yaml` 4.2.0 → 4.3.0（アラート [#141](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/141)）と `brace-expansion` → 1.1.16 / 5.0.8（アラート [#133](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/133)、いずれも CPU 消費型 DoS）を更新し、`postcss` も 8.5.15 → 8.5.24 に先行更新（GHSA-r28c-9q8g-f849、任意 `.map` ファイル漏えい）。アラート [#142](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/142)（GHSA-qwww-vcr4-c8h2、RSC モードの CSRF）は unstable RSC API 未使用かつ 7.x 系修正版が存在しないため「該当機能未使用」として dismiss。凍結スナップショット `versions/v0.1.0` / `versions/v0.1.1` のアラート [#149](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/149) / [#150](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/150) は修正対象外として dismiss
+
 ## [0.1.2] - 2026-06-17
 
 ### セキュリティ
