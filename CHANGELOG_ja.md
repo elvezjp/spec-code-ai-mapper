@@ -10,6 +10,7 @@
 ## [0.2.0] - Unreleased
 
 ### セキュリティ
+- **フロントエンド開発依存の `browserslist` を 4.28.2 → 4.28.9 に更新**: 信頼できないカスタム統計JSONによるクラッシュ／プロトタイプへの書き込み（GHSA-73wf-gq98-2v4g、Dependabot [#190](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/190)）に対応。現行版のロックファイルと関連する5つの依存パッケージを更新。
 - **フロントエンド開発依存の `js-yaml` を 4.3.0 → 4.3.2 に更新**: `!!omap` の処理による過剰な CPU 消費（GHSA-5p4m-2wfm-xmqj、Dependabot [#179](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/179)）に対応。現行版のロックファイルを更新。
 - **[SECURITY] 認証なし API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-f63v-8r92-h4r7）: `POST /api/split/markdown` / `POST /api/split/code` / `POST /api/convert/excel-to-markdown` がクライアント指定のファイル名を一時ディレクトリのパスへそのまま結合していたため、絶対パスや `../` を含む値で一時ディレクトリ外にファイルを作成・上書きできた。クライアント由来のファイル名は `safe_filename()`（`versions/v0.1.2/backend/app/safe_path.py` に追加）でディレクトリ成分を除去してから使用するよう修正し、回帰テストを追加。注: `versions/v0.1.0` / `versions/v0.1.1` にも同一の欠陥があるが、凍結スナップショットのため修正対象外（`versions/` レイアウトは廃止予定）
 - **[SECURITY] CORS のオリジンを限定していない場合に認証情報を許可しないよう修正**（[#25](https://github.com/elvezjp/spec-code-ai-mapper/pull/25)）: `versions/v0.1.2/backend/app/main.py` が `CORS_ORIGINS` 既定値（`*`）のままでも `allow_credentials=True` としていた。Starlette はワイルドカードと認証情報を併用できない仕様のため、この場合 `Access-Control-Allow-Origin` にリクエスト元 Origin をそのまま返し、あわせて `Access-Control-Allow-Credentials: true` を返す。結果として任意のサイトがこの API に資格情報付きで到達して応答を読めるため、ローカル起動中に利用者が悪意あるページを開くとレビュー対象のコードや設計書が読み取られうる状態だった。オリジン一覧に `*` が含まれる場合（Starlette が同じく全許可として扱う `*,https://app.example.com` のような混在指定を含む）は認証情報を許可しないよう修正。オリジンを限定している場合の挙動は変更なし。回帰テストを追加
