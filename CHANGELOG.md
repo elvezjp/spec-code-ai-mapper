@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Updated the backend dependencies**: regenerated `versions/v0.1.2/backend/uv.lock` with `uv lock --upgrade`, updating 31 packages (`anthropic` 0.109.2 → 0.121.0, `openai` 2.42.0 → 2.53.0, `fastapi` 0.137.1 → 0.141.1, `starlette` 1.3.1 → 1.6.0, `uvicorn` 0.49.0 → 0.52.1, `pandas` 3.0.3 → 3.0.5, `markitdown` 0.1.6 → 0.1.7, `tree-sitter` 0.25.2 → 0.26.0, and others). Not a response to a specific advisory — a routine refresh
 - **Updated the in-house tools alongside the tag pinning above**: `add-line-numbers` 0.1.2 → 0.1.3, `md2map` 0.4.3 → 0.5.1, `code2map` 0.2.1 → 0.3.0. `add-line-numbers` v0.1.3 and `code2map` v0.3.0 change no implementation or output (a `cryptography` floor for development dependencies, and retirement of the `versions/` directory). `md2map` v0.5.0 adds OpenAI-compatible `base_url`, `reasoning_effort`, and concurrent per-section AI calls, but all of them are opt-in and the defaults are unchanged, so the behavior of this backend is unaffected; v0.5.1 is the tag-pinning release only
+- **Changed the frontend CI Node.js matrix from `["20", "23"]` to `["20", "24"]`**: Node.js 23 is an odd-numbered release that has reached end of life and is outside the range supported by `vitest` 4.1.11 (`^20.0.0 || ^22.0.0 || >=24.0.0`). CI now tests on Node.js 20 and the Node.js 24 LTS line.
 
 ## [0.1.2] - 2026-06-17
 
