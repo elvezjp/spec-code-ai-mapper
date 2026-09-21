@@ -133,17 +133,19 @@ LLMは以下のJSON形式でグループ化結果を返します。
 
 ## 4. フロントエンド実装
 
-### Mapper コンポーネント
+フロントエンドの実装は [frontend/src/features/reviewer/](../frontend/src/features/reviewer/) にまとまっています。
 
-**ファイル**: `Mapper.tsx`
+### Reviewer コンポーネント（画面全体の制御）
 
-マッピング結果を表示する画面。`SharedStateContext` を通じて分割プレビュー結果やLLM設定を共有し、構造マッチングAPIを呼び出します。
+**ファイル**: [index.tsx](../frontend/src/features/reviewer/index.tsx)
+
+メイン画面・実行中画面・結果画面の 3 画面を切り替えながら、変換 → 分割プレビュー → マッピングの一連の流れを制御します。分割プレビュー結果や LLM 設定などの状態は、このコンポーネントが各フックから受け取り、子コンポーネントへ props で渡します。
 
 | 機能 | 説明 |
 |---|---|
-| マッチング実行 | 分割プレビュー結果（INDEX / MAP）をもとに `executeStructureMatching` APIを呼び出し |
-| 結果テーブル | グループID・設計書セクション・関連コード・理由を一覧表示 |
-| Markdownエクスポート | マッピング結果をMarkdownテーブルとしてダウンロード |
+| 分割プレビュー実行 | 変換済みの設計書 Markdown とコードを `useSplitSettings` の `executeSplitPreview` に渡し、md2map / code2map による分割結果（parts / INDEX / MAP）を取得 |
+| マッピング実行 | 分割プレビュー結果から設計書の `INDEX.md` + `MAP.json` と、コードファイルごとの INDEX + シンボル一覧を組み立て、システムプロンプト・LLM 設定とともに `executeStructureMatching`（`POST /api/review/structure-matching`）を呼び出し。分割プレビューが未実行の場合は実行せずエラーを表示 |
+| 結果の保持 | 返却された `MatchedGroup[]` と実行メタ情報（モデル、トークン数、マッピング方式、グループ数など）を保持し、結果画面に切り替え |
 
 ### 分割設定
 
@@ -151,18 +153,40 @@ LLMは以下のJSON形式でグループ化結果を返します。
 
 | 設定項目 | 説明 |
 |---|---|
-| 設計書モード | 一括 / 分割 の選択 |
-| プログラムモード | 一括 / 分割 の選択 |
-| 分割深度 | 設計書の分割深度（H2 / H3 / H4） |
-| マッピング方式 | 標準（LLM）/ 厳密（ID重視）/ 詳細（内容参照） |
+| 分割モード | 設計書の分割方法。見出し / NLP / AI（推奨）から選択（[分割モード](#分割モード)を参照） |
+| 見出しレベル | 設計書をどの見出しレベルまで分割するか。H2 まで（推奨）/ H3 まで / H4 まで |
+| プログラム | 設定項目なし。code2map によりクラスや関数などの単位で分割。対応言語（Python / Java）以外のファイルは未対応ファイルとして表示 |
+| 分割プレビュー実行 | 上記の設定で分割を実行し、設計書セクションとコードシンボルの一覧をプレビュー表示。マッピング実行の前提となる |
+
+### マッピング方式の選択
+
+**ファイル**: [MappingPolicySection.tsx](../frontend/src/features/reviewer/components/MappingPolicySection.tsx)
+
+標準 (LLM) / 厳密 (ID重視) / 詳細 (内容参照) の 3 方式から選択します。方式の定義は [mappingPresetCatalog.ts](../frontend/src/core/data/mappingPresetCatalog.ts) にあり、選択に応じてシステムプロンプトが切り替わります（[マッピング方式](#マッピング方式)を参照）。
+
+### 結果画面
+
+**ファイル**: [MappingResult.tsx](../frontend/src/features/reviewer/components/MappingResult.tsx) / [MappingResultTable.tsx](../frontend/src/features/reviewer/components/MappingResultTable.tsx)
+
+| 機能 | 説明 |
+|---|---|
+| 結果テーブル | グループ数・設計書セクション数・コードシンボル数のサマリーと、項番・グループ名・設計書セクション・コードシンボル・理由の一覧を表示 |
+| CSV ダウンロード | マッピング結果一覧を CSV としてダウンロード |
+| マッピング結果レポート | Markdown 形式のレポート（セクション形式 + テーブル形式）を表示。クリップボードへのコピーと `mapping-result-report.md` としてのダウンロードが可能 |
+| 実行情報 | バージョン、モデルID、実行日時、トークン数、入力ファイル（設計書・プログラム）を表示（[ExecutionInfo.tsx](../frontend/src/features/reviewer/components/ExecutionInfo.tsx)） |
+| 一式ダウンロード（ZIP） | システムプロンプト、変換後の設計書、行番号付きプログラム、結果レポート、CSV などマッピング実行の入出力データ一式をダウンロード |
+
+実行中は [MappingExecutingScreen.tsx](../frontend/src/features/reviewer/components/MappingExecutingScreen.tsx) が表示されます。
 
 ### 関連するフック・サービス
 
 | ファイル | 役割 |
 |---|---|
-| [useSplitSettings.ts](../frontend/src/features/reviewer/hooks/useSplitSettings.ts) | 分割設定の状態管理、分割プレビューAPI呼び出し |
-| [useReviewerSettings.ts](../frontend/src/features/reviewer/hooks/useReviewerSettings.ts) | LLM設定、システムプロンプト管理 |
-| [api.ts](../frontend/src/features/reviewer/services/api.ts) | 各APIエンドポイントへのリクエスト |
+| [useFileConversion.ts](../frontend/src/features/reviewer/hooks/useFileConversion.ts) | 設計書（Excel → Markdown）とプログラム（行番号付与）の変換、ファイル一覧の状態管理 |
+| [useSplitSettings.ts](../frontend/src/features/reviewer/hooks/useSplitSettings.ts) | 分割設定の状態管理、分割プレビュー API（`splitMarkdown` / `splitCode`）の呼び出し |
+| [useReviewerSettings.ts](../frontend/src/features/reviewer/hooks/useReviewerSettings.ts) | LLM 設定、システムプロンプト管理、マッピング方式の適用 |
+| [useZipExport.ts](../frontend/src/features/reviewer/hooks/useZipExport.ts) | 結果レポートの生成（`buildMappingResultReport`）、CSV / ZIP のダウンロード |
+| [api.ts](../frontend/src/features/reviewer/services/api.ts) | 各 API エンドポイントへのリクエスト（`executeStructureMatching` を含む） |
 
 ---
 
