@@ -185,7 +185,7 @@ git checkout v0.1.2
 
 For details, see [SECURITY.md](SECURITY.md).
 
-- Security measures for file processing (Excel files opened in `read_only=True` mode, file size limits, etc.)
+- File processing checks include file extension validation and file size limits. Excel loading behavior depends on the conversion tool; see SECURITY.md.
 - API keys should be managed via environment variables, not hardcoded
 - Only process files from trusted sources
 

@@ -4,11 +4,11 @@
 
 ## Supported Versions
 
-Only the upcoming latest version, 0.2.0, is supported. It has not been released yet.
+Only the latest version, 0.2.0, is supported.
 
 | Version | Supported |
 | --- | --- |
-| 0.2.0 (upcoming) | Yes |
+| 0.2.0 | Yes |
 | < 0.2.0 | No |
 
 ## Intended Environment
@@ -107,7 +107,7 @@ This application may use the following APIs:
 
 spec-code-ai-mapper includes the following security measures:
 
-- Uses `read_only=True` mode when processing Excel files
+- Excel loading behavior depends on the conversion tool. The excel2md path uses `read_only=False`; read-only loading is not guaranteed for all conversions
 - Enforces file-size limits
 - Validates input files
 

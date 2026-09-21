@@ -107,7 +107,7 @@ cd backend
 uv run pytest tests/ -v
 
 # バックエンド：特定のテストファイルを実行
-uv run pytest tests/test_convert.py -v
+uv run pytest tests/test_main.py -v
 
 # バックエンド：カバレッジ付きで実行
 uv run pytest tests/ --cov=app --cov-report=html
