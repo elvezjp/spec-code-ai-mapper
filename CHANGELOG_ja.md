@@ -22,6 +22,10 @@
 - **バックエンドの依存パッケージを更新**: `uv lock --upgrade` により `versions/v0.1.2/backend/uv.lock` を再生成し、31件を更新（`anthropic` 0.109.2 → 0.121.0、`openai` 2.42.0 → 2.53.0、`fastapi` 0.137.1 → 0.141.1、`starlette` 1.3.1 → 1.6.0、`uvicorn` 0.49.0 → 0.52.1、`pandas` 3.0.3 → 3.0.5、`markitdown` 0.1.6 → 0.1.7、`tree-sitter` 0.25.2 → 0.26.0 ほか）。特定のアドバイザリに対応するものではなく定期更新
 - **上記のタグ固定にあわせて自社ツールを更新**: `add-line-numbers` 0.1.2 → 0.1.3、`md2map` 0.4.3 → 0.5.1、`code2map` 0.2.1 → 0.3.0。`add-line-numbers` v0.1.3 と `code2map` v0.3.0 は実装・出力に変更なし（開発依存 `cryptography` の下限引き上げと `versions/` ディレクトリの廃止）。`md2map` v0.5.0 は OpenAI 互換 API の `base_url`、`reasoning_effort`、セクション単位 AI 呼び出しの並列実行を追加しているが、いずれもオプトインで既定値は従来どおりのため、本バックエンドの挙動には影響しない。v0.5.1 はタグ固定のみのリリース
 - **フロントエンド CI の Node.js マトリクスを `["20", "23"]` → `["20", "24"]` に変更**: Node.js 23 はサポートが終了した奇数版で、`vitest` 4.1.11 の対応範囲（`^20.0.0 || ^22.0.0 || >=24.0.0`）外のため。Node.js 20 と LTS 系の Node.js 24 でテストする。
+- **[BREAKING] `excel2md` を同梱ディレクトリの `sys.path` 注入から PyPI 依存に移行** (#20): `excel2md_tool.py` / `excel2md_mermaid_tool.py` は、リポジトリ直下に同梱した `excel2md/v2.1.1` を `sys.path` に動的注入して読み込んでおり、#27 で他の自社ツールがタグ固定の git 依存になって以降、`excel2md` だけが `pyproject.toml` の依存管理の外に残っていた。`dependencies` に `excel2md>=2.2.1` を追加し（PyPI 公開済みのため `[tool.uv.sources]` は不要。lock 上は 2.3.0）、`excel2md.cli.build_argparser` / `excel2md.runner.run` の通常 import に書き換えた。これに伴い、同梱外の excel2md を指定するための環境変数 `EXCEL2MD_PATH` は廃止した。excel2md は v2.1.1 → v2.3.0 となり、v2.2 系の修正と v2.3.0 の性能改善が取り込まれる。変換結果の差分として、**印刷領域（未設定時は使用範囲）の外に置かれた画像のリンクが CSV マークダウンに出力されなくなる**（上流 v2.2.1 の修正 [excel2md#14](https://github.com/elvezjp/excel2md/issues/14)。従来は領域外の画像が出力範囲を引き伸ばし、無関係なセルまで巻き込んでいた）。それ以外のシート（表・結合セル・複数テーブル・ハイパーリンク）と Mermaid 出力は、同梱のテストフィクスチャで移行前後の一致（生成日時の行を除く）を確認済み。全 194 テストがパス
+
+### 削除
+- **[BREAKING] バージョン切替 UI を廃止** (#16): 画面左上のピル型バージョンボタンとバルーン（`VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo`）、および `app_version` Cookie の読み書きを削除した。AIレビュアー由来の機能だが、Cookie の値に応じてバージョンごとのバックエンド／フロントエンドへ振り分けるインフラ（nginx 等）が本リポジトリには存在せず、選択肢も現行バージョン 1 件のみで、機能していなかった。起動中のバージョンは従来どおり設定モーダルで確認できる。ブラウザに残った `app_version` Cookie は参照されなくなるため無害
 
 ## [0.1.2] - 2026-06-17
 
