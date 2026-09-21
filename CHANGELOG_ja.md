@@ -27,6 +27,7 @@
 
 ### 削除
 - **[BREAKING] バージョン切替 UI を廃止** (#16): 画面左上のピル型バージョンボタンとバルーン（`VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo`）、および `app_version` Cookie の読み書きを削除した。AIレビュアー由来の機能だが、Cookie の値に応じてバージョンごとのバックエンド／フロントエンドへ振り分けるインフラ（nginx 等）が本リポジトリには存在せず、選択肢も現行バージョン 1 件のみで、機能していなかった。起動中のバージョンは従来どおり設定モーダルで確認できる。ブラウザに残った `app_version` Cookie は参照されなくなるため無害
+- **[BREAKING] git subtree で取り込んでいた外部ツールのディレクトリ 5 つを削除** (#16, #20): `add-line-numbers/`・`code2map/`・`excel2md/`・`markitdown/`・`md2map/`（計 779 ファイル）を削除した。`markitdown` と `excel2md` は PyPI、`add-line-numbers`・`code2map`・`md2map` は上流リリースタグの git 依存として uv が取得しており、同梱ディレクトリはどこからも参照されなくなっていた。実体を残すと上流の更新を取り込めないうえ、同梱ディレクトリ内の manifest（上流の旧バージョン `code2map/versions/`・`md2map/versions/` の lockfile を含む）が Dependabot に独立した依存セットとして認識され、重複アラートの原因になっていた。これによりリポジトリ内の依存マニフェストは 33 ファイルから 4 ファイル（`backend/pyproject.toml`・`backend/uv.lock`・`frontend/package.json`・`frontend/package-lock.json`）になった。ソースを参照したい場合は各上流リポジトリを clone する
 
 ## [0.1.2] - 2026-06-17
 
