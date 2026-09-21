@@ -10,11 +10,9 @@ import {
   SettingsModal,
   TokenEstimator,
   SystemPromptEditor,
-  VersionSelector,
   useModal,
   useScreenManager,
   useTokenEstimation,
-  useVersions,
 } from '@core/index'
 import {
   SpecTypesSection,
@@ -40,7 +38,6 @@ const APP_INFO = {
 
 export function Reviewer() {
   const settingsModal = useModal()
-  const { versions, currentVersion, switchVersion } = useVersions()
   const { currentScreen, showMain, showExecuting, showResult } = useScreenManager()
   const [toastMessage, setToastMessage] = useState('')
   const toastTimerRef = useRef<number | null>(null)
@@ -372,13 +369,6 @@ export function Reviewer() {
             {/* Header */}
             <Header
                 title={APP_INFO.description}
-                leftContent={
-                  <VersionSelector
-                    versions={versions}
-                    currentVersion={currentVersion}
-                    onVersionSelect={switchVersion}
-                  />
-                }
                 rightContent={
                   <div className="flex items-center gap-3">
                     <button
