@@ -79,7 +79,7 @@
 ### 前提条件
 
 - Python 3.11 以上
-- Node.js 18 以上
+- Node.js 20.19以上（20.x）、22.12以上（22.x）、または24以上
 - [uv](https://docs.astral.sh/uv/) パッケージマネージャー
 - AWS アカウント（Bedrock へのアクセス権限）または Anthropic/OpenAI API キー
 
@@ -107,7 +107,7 @@ cd backend
 uv run pytest tests/ -v
 
 # バックエンド：特定のテストファイルを実行
-uv run pytest tests/test_convert.py -v
+uv run pytest tests/test_main.py -v
 
 # バックエンド：カバレッジ付きで実行
 uv run pytest tests/ --cov=app --cov-report=html

@@ -15,6 +15,16 @@ AI Mapper is a tool that automatically maps sections of design documents (Markdo
 
 https://github.com/user-attachments/assets/48b9c0a0-3739-4486-8c4f-ac467c5b91e7
 
+## Intended Environment
+
+This tool is intended for local use and has no application authentication or authorization. Anyone who can reach it may invoke the LLM using server credentials and incur charges.
+
+- Start the backend with `--host 127.0.0.1`.
+- If exposing it on a network, require authentication at a reverse proxy and restrict direct access to the backend.
+- CORS defaults to `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:4173`, and `http://127.0.0.1:4173`, including when unset or blank.
+- Set `CORS_ORIGINS` explicitly for other origins. Credentials are disabled whenever the list contains `*`. Avoid allow-all settings. CORS does not replace authentication or network access controls.
+
+
 ## Features
 
 - **Traceability Matrix Generation**: Displays a list of mappings between design sections and code symbols, with AI explaining the reasoning.
@@ -77,7 +87,7 @@ Results can be exported in Markdown format.
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+
+- Node.js 20.19+ (20.x), 22.12+ (22.x), or 24+
 - [uv](https://docs.astral.sh/uv/) package manager
 - AWS account (with Bedrock access) or Anthropic/OpenAI API key
 
@@ -95,7 +105,7 @@ cd spec-code-ai-mapper
 ```bash
 cd backend
 uv sync
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 **Frontend**
@@ -175,7 +185,7 @@ git checkout v0.1.2
 
 For details, see [SECURITY.md](SECURITY.md).
 
-- Security measures for file processing (Excel files opened in `read_only=True` mode, file size limits, etc.)
+- File processing checks include file extension validation and file size limits. Excel loading behavior depends on the conversion tool; see SECURITY.md.
 - API keys should be managed via environment variables, not hardcoded
 - Only process files from trusted sources
 
