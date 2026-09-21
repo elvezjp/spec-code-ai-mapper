@@ -10,6 +10,7 @@
 ## [0.2.0] - Unreleased
 
 ### セキュリティ
+- **フロントエンド開発依存の `vitest` を 4.1.9 → 4.1.11 に更新**: `@vitest/mocker` のリダイレクトモックを経由したパストラバーサル／任意ファイル読み取り（GHSA-82fw-gwwq-j7x9、Dependabot [#201](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/201) / [#194](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/194)）に対応。現行版のロックファイルを更新し、`@vitest/mocker` を含む9パッケージを更新。
 - **フロントエンド開発依存の `browserslist` を 4.28.2 → 4.28.9 に更新**: 信頼できないカスタム統計JSONによるクラッシュ／プロトタイプへの書き込み（GHSA-73wf-gq98-2v4g、Dependabot [#190](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/190)）に対応。現行版のロックファイルと関連する5つの依存パッケージを更新。
 - **フロントエンド開発依存の `js-yaml` を 4.3.0 → 4.3.2 に更新**: `!!omap` の処理による過剰な CPU 消費（GHSA-5p4m-2wfm-xmqj、Dependabot [#179](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/179)）に対応。現行版のロックファイルを更新。
 - **[SECURITY] 認証なし API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-f63v-8r92-h4r7）: `POST /api/split/markdown` / `POST /api/split/code` / `POST /api/convert/excel-to-markdown` がクライアント指定のファイル名を一時ディレクトリのパスへそのまま結合していたため、絶対パスや `../` を含む値で一時ディレクトリ外にファイルを作成・上書きできた。クライアント由来のファイル名は `safe_filename()`（`versions/v0.1.2/backend/app/safe_path.py` に追加）でディレクトリ成分を除去してから使用するよう修正し、回帰テストを追加。注: `versions/v0.1.0` / `versions/v0.1.1` にも同一の欠陥があるが、凍結スナップショットのため修正対象外（`versions/` レイアウトは廃止予定）
@@ -20,6 +21,7 @@
 ### 変更
 - **バックエンドの依存パッケージを更新**: `uv lock --upgrade` により `versions/v0.1.2/backend/uv.lock` を再生成し、31件を更新（`anthropic` 0.109.2 → 0.121.0、`openai` 2.42.0 → 2.53.0、`fastapi` 0.137.1 → 0.141.1、`starlette` 1.3.1 → 1.6.0、`uvicorn` 0.49.0 → 0.52.1、`pandas` 3.0.3 → 3.0.5、`markitdown` 0.1.6 → 0.1.7、`tree-sitter` 0.25.2 → 0.26.0 ほか）。特定のアドバイザリに対応するものではなく定期更新
 - **上記のタグ固定にあわせて自社ツールを更新**: `add-line-numbers` 0.1.2 → 0.1.3、`md2map` 0.4.3 → 0.5.1、`code2map` 0.2.1 → 0.3.0。`add-line-numbers` v0.1.3 と `code2map` v0.3.0 は実装・出力に変更なし（開発依存 `cryptography` の下限引き上げと `versions/` ディレクトリの廃止）。`md2map` v0.5.0 は OpenAI 互換 API の `base_url`、`reasoning_effort`、セクション単位 AI 呼び出しの並列実行を追加しているが、いずれもオプトインで既定値は従来どおりのため、本バックエンドの挙動には影響しない。v0.5.1 はタグ固定のみのリリース
+- **フロントエンド CI の Node.js マトリクスを `["20", "23"]` → `["20", "24"]` に変更**: Node.js 23 はサポートが終了した奇数版で、`vitest` 4.1.11 の対応範囲（`^20.0.0 || ^22.0.0 || >=24.0.0`）外のため。Node.js 20 と LTS 系の Node.js 24 でテストする。
 
 ## [0.1.2] - 2026-06-17
 
