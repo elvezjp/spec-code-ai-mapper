@@ -703,7 +703,7 @@ AIへの指示内容をユーザーがカスタマイズ可能。以下の4項�
 
 ## info
 
-- version: v0.4.0
+- version: v0.2.0
 - created_at: 2025-01-15T10:30:00+09:00
 
 ## llm
@@ -1656,7 +1656,7 @@ OpenAI:
   "success": true,
   "report": "# 設計書-Javaプログラム紐付け AIマッパー レビューレポート\n\n## レビュー情報\n\n| 項目 | 内容 |\n|------|------|\n| バージョン | v0.2.0 |\n| レビュー実行日時 | 2024/12/21 14:30 |\n\n### 設計書\n\n...\n\n---\n\n## AIによるレビュー結果\n\n以下はAIが出力したレビュー結果です。\n\n（LLM出力）\n...",
   "reviewMeta": {
-    "version": "v0.3.0",
+    "version": "v0.2.0",
     "modelId": "claude-haiku-4-5-20251001",
     "executedAt": "2024/12/21 14:30",
     "designs": [
