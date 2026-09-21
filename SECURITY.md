@@ -4,12 +4,21 @@
 
 ## Supported Versions
 
-We support the latest version:
+Only the upcoming latest version, 0.2.0, is supported. It has not been released yet.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.2   | :white_check_mark: |
-| < 0.1.2 | :x:                |
+| Version | Supported |
+| --- | --- |
+| 0.2.0 (upcoming) | Yes |
+| < 0.2.0 | No |
+
+## Intended Environment
+
+This tool is intended for local use and has no application authentication or authorization. Anyone who can reach it may invoke the LLM using server credentials and incur charges.
+
+- Start the backend with `--host 127.0.0.1`.
+- If exposing it on a network, require authentication at a reverse proxy and restrict direct access to the backend.
+- CORS defaults to `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:4173`, and `http://127.0.0.1:4173`, including when unset or blank.
+- Set `CORS_ORIGINS` explicitly for other origins. Credentials are disabled whenever the list contains `*`. Avoid allow-all settings. CORS does not replace authentication or network access controls.
 
 ## Reporting a Vulnerability
 
@@ -17,9 +26,9 @@ If you discover a security vulnerability in spec-code-ai-mapper, please follow t
 
 ### How to Report
 
-1. **Do NOT** open a public GitHub issue for security vulnerabilities
-2. Open a GitHub private security advisory for this repository (recommended)
-3. If you cannot use private security advisories, contact the maintainers directly with a detailed report
+1. Do not post vulnerability details in public GitHub Issues, regardless of severity.
+2. Use [GitHub private vulnerability reporting](https://github.com/elvezjp/spec-code-ai-mapper/security/advisories/new).
+3. If private reporting is unavailable, email info@elvez.co.jp.
 
 ### What to Include
 

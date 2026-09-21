@@ -79,7 +79,7 @@ Enhancement proposals are welcome. Please open an issue with:
 ### Prerequisites
 
 - Python 3.11 or later
-- Node.js 18 or later
+- Node.js 20.19+ (20.x), 22.12+ (22.x), or 24+
 - The [uv](https://docs.astral.sh/uv/) package manager
 - An AWS account (with Bedrock access) or an Anthropic / OpenAI API key
 
