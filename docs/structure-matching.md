@@ -10,16 +10,16 @@
 
 ## 1. md2map（設計書の分割）
 
-**ディレクトリ**: [md2map/](../md2map/)
+**リポジトリ**: [elvezjp/md2map](https://github.com/elvezjp/md2map)（本アプリは `v0.5.1` を使用）
 
 マークダウン変換済みの設計書を、見出し（H1〜H6）単位でセクション分割します。
 
 | コンポーネント | ファイル | 役割 |
 |---|---|---|
-| パーサー | [markdown_parser.py](../md2map/md2map/parsers/markdown_parser.py) | ATXスタイルの見出しを正規表現で解析。コードブロックやfrontmatterを考慮 |
-| Parts生成 | [parts_generator.py](../md2map/md2map/generators/parts_generator.py) | 各セクションを個別ファイルに出力（`<H1>_<H2>_<H3>.md`形式） |
-| Index生成 | [index_generator.py](../md2map/md2map/generators/index_generator.py) | 階層ツリー構造の `INDEX.md` を作成 |
-| Map生成 | [map_generator.py](../md2map/md2map/generators/map_generator.py) | `MAP.json` を生成（id, section, level, path, 行範囲, word count, SHA-256チェックサム） |
+| パーサー | [markdown_parser.py](https://github.com/elvezjp/md2map/blob/v0.5.1/md2map/parsers/markdown_parser.py) | ATXスタイルの見出しを正規表現で解析。コードブロックやfrontmatterを考慮 |
+| Parts生成 | [parts_generator.py](https://github.com/elvezjp/md2map/blob/v0.5.1/md2map/generators/parts_generator.py) | 各セクションを個別ファイルに出力（`<H1>_<H2>_<H3>.md`形式） |
+| Index生成 | [index_generator.py](https://github.com/elvezjp/md2map/blob/v0.5.1/md2map/generators/index_generator.py) | 階層ツリー構造の `INDEX.md` を作成 |
+| Map生成 | [map_generator.py](https://github.com/elvezjp/md2map/blob/v0.5.1/md2map/generators/map_generator.py) | `MAP.json` を生成（id, section, level, path, 行範囲, word count, SHA-256チェックサム） |
 
 各セクションには `MD1`, `MD2`, ... のIDが付与され、デフォルトの分割深度は **H2** です。
 
@@ -61,14 +61,14 @@ LLMプロバイダーの認証情報が必要。見出しベースで分割し�
 
 ## 2. code2map（ソースコードの分割）
 
-**ディレクトリ**: [code2map/](../code2map/)
+**リポジトリ**: [elvezjp/code2map](https://github.com/elvezjp/code2map)（本アプリは `v0.3.0` を使用）
 
 ソースコードをAST（抽象構文木）解析し、クラス・メソッド・関数単位で分割します。
 
 | パーサー | ファイル | 方式 |
 |---|---|---|
-| Python | [python_parser.py](../code2map/parsers/python_parser.py) | Python標準の`ast`モジュールで解析。クラス、メソッド、トップレベル関数を抽出 |
-| Java | [java_parser.py](../code2map/parsers/java_parser.py) | `javalang`ライブラリで解析。クラス、インターフェース、メソッド、コンストラクタを抽出 |
+| Python | [python_parser.py](https://github.com/elvezjp/code2map/blob/v0.3.0/code2map/parsers/python_parser.py) | Python標準の`ast`モジュールで解析。クラス、メソッド、トップレベル関数を抽出 |
+| Java | [java_parser.py](https://github.com/elvezjp/code2map/blob/v0.3.0/code2map/parsers/java_parser.py) | `javalang`ライブラリで解析。クラス、インターフェース、メソッド、コンストラクタを抽出 |
 
 各シンボルには `CD1`, `CD2`, ... のIDが付与されます。ネストされた関数は親に含められます。
 
@@ -76,11 +76,11 @@ LLMプロバイダーの認証情報が必要。見出しベースで分割し�
 
 ## 3. 構造マッチング
 
-バックエンドのAPIは [versions/v0.8.0/backend/app/routers/](../versions/v0.8.0/backend/app/routers/) に実装されています。
+バックエンドのAPIは [backend/app/routers/](../backend/app/routers/) に実装されています。
 
 ### エンドポイント: `POST /api/review/structure-matching`
 
-**ファイル**: [review.py](../versions/v0.8.0/backend/app/routers/review.py)
+**ファイル**: [review.py](../backend/app/routers/review.py)
 
 - **入力**: 設計書とコードそれぞれの `INDEX.md` + `MAP.json`
 - **処理**: LLMが両方の構造を分析し、関連性の高いセクションとコードシンボルを **多対多** のグループにまとめる
@@ -135,7 +135,7 @@ LLMは以下のJSON形式でグループ化結果を返します。
 
 ### Mapper コンポーネント
 
-**ファイル**: [Mapper.tsx](../versions/v0.8.0/frontend/src/features/mapper/Mapper.tsx)
+**ファイル**: `Mapper.tsx`
 
 マッピング結果を表示する画面。`SharedStateContext` を通じて分割プレビュー結果やLLM設定を共有し、構造マッチングAPIを呼び出します。
 
@@ -147,7 +147,7 @@ LLMは以下のJSON形式でグループ化結果を返します。
 
 ### 分割設定
 
-**ファイル**: [SplitSettingsSection.tsx](../versions/v0.8.0/frontend/src/features/reviewer/components/SplitSettingsSection.tsx)
+**ファイル**: [SplitSettingsSection.tsx](../frontend/src/features/reviewer/components/SplitSettingsSection.tsx)
 
 | 設定項目 | 説明 |
 |---|---|
@@ -160,9 +160,9 @@ LLMは以下のJSON形式でグループ化結果を返します。
 
 | ファイル | 役割 |
 |---|---|
-| [useSplitSettings.ts](../versions/v0.8.0/frontend/src/features/reviewer/hooks/useSplitSettings.ts) | 分割設定の状態管理、分割プレビューAPI呼び出し |
-| [useReviewerSettings.ts](../versions/v0.8.0/frontend/src/features/reviewer/hooks/useReviewerSettings.ts) | LLM設定、システムプロンプト管理 |
-| [api.ts](../versions/v0.8.0/frontend/src/features/reviewer/services/api.ts) | 各APIエンドポイントへのリクエスト |
+| [useSplitSettings.ts](../frontend/src/features/reviewer/hooks/useSplitSettings.ts) | 分割設定の状態管理、分割プレビューAPI呼び出し |
+| [useReviewerSettings.ts](../frontend/src/features/reviewer/hooks/useReviewerSettings.ts) | LLM設定、システムプロンプト管理 |
+| [api.ts](../frontend/src/features/reviewer/services/api.ts) | 各APIエンドポイントへのリクエスト |
 
 ---
 

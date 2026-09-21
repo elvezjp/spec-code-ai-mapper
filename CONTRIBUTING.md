@@ -43,14 +43,14 @@ Enhancement proposals are welcome. Please open an issue with:
 3. **Write tests** for your changes
    ```bash
    # Run backend tests
-   cd versions/v0.1.2/backend
+   cd backend
    uv run pytest tests/ -v
 
    # Run backend tests with coverage
    uv run pytest tests/ --cov=app --cov-report=html
 
    # Run frontend tests
-   cd versions/v0.1.2/frontend
+   cd frontend
    npm run test:run
 
    # Run frontend tests with coverage
@@ -91,7 +91,7 @@ git clone https://github.com/YOUR-USERNAME/spec-code-ai-mapper.git
 cd spec-code-ai-mapper
 
 # Install backend dependencies
-cd versions/v0.1.2/backend
+cd backend
 uv sync
 
 # Install frontend dependencies
@@ -103,7 +103,7 @@ npm install
 
 ```bash
 # Backend: run all tests
-cd versions/v0.1.2/backend
+cd backend
 uv run pytest tests/ -v
 
 # Backend: run a specific test file
@@ -113,7 +113,7 @@ uv run pytest tests/test_convert.py -v
 uv run pytest tests/ --cov=app --cov-report=html
 
 # Frontend: run all tests
-cd versions/v0.1.2/frontend
+cd frontend
 npm run test:run
 
 # Frontend: run tests in watch mode

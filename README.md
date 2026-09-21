@@ -93,7 +93,7 @@ cd spec-code-ai-mapper
 **Backend**
 
 ```bash
-cd versions/v0.1.2/backend
+cd backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -101,7 +101,7 @@ uv run uvicorn app.main:app --reload --port 8000
 **Frontend**
 
 ```bash
-cd versions/v0.1.2/frontend
+cd frontend
 npm install
 npm run dev
 ```
@@ -130,30 +130,45 @@ Open <http://localhost:5173> in your browser.
 
 ```text
 spec-code-ai-mapper/
-├── versions/                    # Version storage
-│   ├── v0.1.0/                  # Initial release
-│   ├── v0.1.1/                  # excel2md v2.1.1
-│   └── v0.1.2/                  # Latest version (Python 3.11+, idna 3.16)
-│       ├── backend/             # Python / FastAPI
-│       ├── frontend/            # Vite + React + TypeScript
-│       └── spec.md              # Specification document
+├── backend/                     # Python / FastAPI
+├── frontend/                    # Vite + React + TypeScript
 │
 ├── docs/                        # Documentation
+│   ├── spec.md                  # Specification document
+│   ├── config-file-generator-spec.md  # Config file generator specification
 │   └── structure-matching.md    # Structure matching details
 │
-├── add-line-numbers/            # Subtree (elvezjp)
-├── code2map/                    # Subtree (elvezjp)
-├── excel2md/                    # Subtree (elvezjp)
-├── markitdown/                  # Subtree (Microsoft)
-├── md2map/                      # Subtree (elvezjp)
+├── .env.example                 # Sample environment variables for the system LLM (AWS Bedrock)
 └── README.md                    # This file
 ```
+
+## Version Management
+
+Only the latest code is kept at the repository root. Versions are managed with git tags.
+
+- The `main` branch accumulates changes for the next version under a `## [X.Y.Z] - Unreleased` heading in [CHANGELOG.md](CHANGELOG.md)
+- On release, the heading date is finalized, the version in `backend/pyproject.toml` (and the frontend version labels) is confirmed, and a `vX.Y.Z` tag is created
+
+### Using Old Versions
+
+Old versions (v0.1.0–v0.1.2) were previously kept as snapshots under a `versions/` directory. That layout, including the external-tool directories embedded via git subtree, is preserved in the `v0.1.2` tag:
+
+```bash
+git checkout v0.1.2
+# Old versions are under versions/v0.1.0 ... versions/v0.1.2
+```
+
+**Note**:
+
+- The code under the `v0.1.2` tag is a frozen snapshot and does not include the security fixes made in v0.2.0 and later (path traversal, CORS configuration, and others — see [CHANGELOG.md](CHANGELOG.md)). Use it for reference and verification only, and use the latest version for actual use
+- Do not delete or move the `v0.1.2` tag — it serves as the archive reference point for the old layout
 
 ## Documentation
 
 - [CHANGELOG.md](CHANGELOG.md) - Changelog
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [SECURITY.md](SECURITY.md) - Security policy
+- [Specification](docs/spec.md) - Detailed specification (Japanese)
 - [Structure Matching Details](docs/structure-matching.md) - AI mapping and structure matching technical details
 
 ## Security
@@ -166,28 +181,17 @@ For details, see [SECURITY.md](SECURITY.md).
 
 ### Dependabot Alert Policy
 
-This repository keeps past releases archived under `versions/`, which means Dependabot alerts are also raised against their lockfiles. In addition, `add-line-numbers/`, `code2map/`, `excel2md/`, `markitdown/`, and `md2map/` are pulled in via git subtree, and their dependencies are managed in the upstream repositories. Given this, we operate Dependabot alerts as follows.
+This repository keeps only the latest code at the root (`backend/` / `frontend/`) and old versions are referenced via git tags, so old versions are not scanned by Dependabot. The external tools (`add-line-numbers`, `code2map`, `excel2md`, `markitdown`, `md2map`) are installed as uv dependencies, so their vulnerabilities are detected through the root lockfiles. Given this, we operate Dependabot alerts as follows.
 
 #### Malware tab
 
-- **Always fix, regardless of where it is detected**
-- Malware is not left in place even in archived versions or under git subtree directories
+- **Always fix**
 
 #### Vulnerable tab
 
 | Target | Action |
 |--------|--------|
-| The latest version under `versions/` | **Fix** (dependency update / PR) |
-| Older versions archived under `versions/` | **Dismiss**. Bulk-close existing alerts and dismiss new ones after confirming no impact |
-| git subtree directories (`add-line-numbers/`, `code2map/`, `excel2md/`, `markitdown/`, `md2map/`) | **Dismiss**. Managed in the upstream subtree repositories |
-
-#### Workflow
-
-1. When a new alert appears, first check whether it is on the **Malware** tab or the **Vulnerable** tab
-2. **Malware** → fix it regardless of location
-3. **Vulnerable** → check the location
-   - Latest version directory → fix
-   - Older versions or under git subtree → dismiss after confirming no impact
+| Root lockfiles (`backend/uv.lock`, `frontend/package-lock.json`) | **Fix** (dependency update / PR) |
 
 A dismissed alert will not reappear for the same combination of manifest × package × CVE, but a new CVE published for the same package will be raised as a new alert.
 
@@ -220,12 +224,14 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ## Related Projects
 
-This repository includes the following external repositories added via git subtree.
+The following external tools are used as dependencies (installed via uv from PyPI or git sources — see `backend/pyproject.toml`).
 
-| Directory | Repository | Description |
-|-----------|-----------|-------------|
-| `add-line-numbers/` | https://github.com/elvezjp/add-line-numbers | Tool to add line numbers to files |
-| `code2map/` | https://github.com/elvezjp/code2map | Source code to mind map conversion tool |
-| `excel2md/` | https://github.com/elvezjp/excel2md | Excel to CSV Markdown conversion tool |
-| `markitdown/` | https://github.com/microsoft/markitdown | Convert various file formats to Markdown |
-| `md2map/` | https://github.com/elvezjp/md2map | Markdown to mind map conversion tool |
+| Package | Repository | Description |
+|---------|-----------|-------------|
+| add-line-numbers | https://github.com/elvezjp/add-line-numbers | Tool to add line numbers to files |
+| code2map | https://github.com/elvezjp/code2map | Source code to mind map conversion tool |
+| excel2md | https://github.com/elvezjp/excel2md | Excel to CSV Markdown conversion tool |
+| markitdown | https://github.com/microsoft/markitdown | Convert various file formats to Markdown |
+| md2map | https://github.com/elvezjp/md2map | Markdown to mind map conversion tool |
+
+If you need the sources for reference, clone the upstream repositories directly (e.g., `git clone https://github.com/elvezjp/excel2md.git`). These repositories were previously embedded as git subtrees; that layout is preserved in the `v0.1.2` tag.
