@@ -93,7 +93,7 @@ cd spec-code-ai-mapper
 **バックエンド**
 
 ```bash
-cd versions/v0.1.2/backend
+cd backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -101,7 +101,7 @@ uv run uvicorn app.main:app --reload --port 8000
 **フロントエンド**
 
 ```bash
-cd versions/v0.1.2/frontend
+cd frontend
 npm install
 npm run dev
 ```
@@ -130,30 +130,45 @@ npm run dev
 
 ```text
 spec-code-ai-mapper/
-├── versions/                    # バージョン格納
-│   ├── v0.1.0/                  # 初版
-│   ├── v0.1.1/                  # excel2md v2.1.1
-│   └── v0.1.2/                  # 最新版（Python 3.11+、idna 3.16）
-│       ├── backend/             # Python / FastAPI
-│       ├── frontend/            # Vite + React + TypeScript
-│       └── spec.md              # 仕様書
+├── backend/                     # Python / FastAPI
+├── frontend/                    # Vite + React + TypeScript
 │
 ├── docs/                        # ドキュメント
+│   ├── spec.md                  # 仕様書
+│   ├── config-file-generator-spec.md  # 設定ファイルジェネレーター仕様書
 │   └── structure-matching.md    # 構造マッチング機能の詳細
 │
-├── add-line-numbers/            # サブツリー（elvezjp）
-├── code2map/                    # サブツリー（elvezjp）
-├── excel2md/                    # サブツリー（elvezjp）
-├── markitdown/                  # サブツリー（Microsoft）
-├── md2map/                      # サブツリー（elvezjp）
+├── .env.example                 # システムLLM（AWS Bedrock）用の環境変数サンプル
 └── README.md                    # 本ファイル
 ```
+
+## バージョン管理
+
+リポジトリのルートでは最新のコードのみを保持し、バージョン管理は git tag で行います。
+
+- `main` ブランチには次バージョンの変更を [CHANGELOG_ja.md](CHANGELOG_ja.md) の `## [X.Y.Z] - Unreleased` 見出しの下に蓄積します
+- リリース時に見出しの日付を確定し、`backend/pyproject.toml` のバージョン（およびフロントエンドのバージョン表記）を確認のうえ、`vX.Y.Z` タグを作成します
+
+### 旧バージョンを利用する場合
+
+旧バージョン（v0.1.0〜v0.1.2）は、以前は `versions/` ディレクトリ配下にスナップショットとして保持していました。この構成（git subtree で取り込んでいた外部ツールのディレクトリを含む）は `v0.1.2` タグに保存されています。
+
+```bash
+git checkout v0.1.2
+# 旧バージョンは versions/v0.1.0 〜 versions/v0.1.2 配下にあります
+```
+
+**注意**:
+
+- `v0.1.2` タグ配下のコードは凍結スナップショットであり、v0.2.0 以降のセキュリティ修正（パストラバーサル、CORS 設定など。詳細は [CHANGELOG_ja.md](CHANGELOG_ja.md)）を含みません。参照・検証用途に限り、実際の利用には最新版を使用してください
+- `v0.1.2` タグは旧構成のアーカイブ参照点のため、削除・付け替えを行わないでください
 
 ## ドキュメント
 
 - [CHANGELOG_ja.md](CHANGELOG_ja.md) - 変更履歴
 - [CONTRIBUTING_ja.md](CONTRIBUTING_ja.md) - コントリビューション方法
 - [SECURITY_ja.md](SECURITY_ja.md) - セキュリティポリシー
+- [仕様書](docs/spec.md) - 詳細仕様書
 - [構造マッチング機能の詳細](docs/structure-matching.md) - AI マッピングと構造マッチングの技術詳細
 
 ## セキュリティ
@@ -166,28 +181,17 @@ spec-code-ai-mapper/
 
 ### Dependabotアラートの運用方針
 
-本リポジトリは旧バージョンのコードを `versions/` 配下にアーカイブとして保持する運用のため、それらの lockfile に対しても Dependabot アラートが発生します。また、`add-line-numbers/`、`code2map/`、`excel2md/`、`markitdown/`、`md2map/` は git subtree で取り込んでおり、依存管理は各 subtree 元リポジトリ側で行います。これらを踏まえ、本リポジトリでは以下の方針で Dependabot アラートを運用します。
+本リポジトリはルート直下（`backend/` / `frontend/`）に最新コードのみを保持し、旧バージョンは git tag で参照するため、旧バージョンは Dependabot のスキャン対象になりません。外部ツール（`add-line-numbers`、`code2map`、`excel2md`、`markitdown`、`md2map`）は uv の依存関係として取得しており、それらの脆弱性はルートの lockfile 経由で検出されます。これらを踏まえ、本リポジトリでは以下の方針で Dependabot アラートを運用します。
 
 #### Malware タブ
 
-- **発生場所を問わず必ず修正対応する**
-- 旧バージョン・git subtree 配下であってもマルウェアは放置しない
+- **必ず修正対応する**
 
 #### Vulnerable タブ
 
 | 対象 | 対応 |
 |------|------|
-| 最新バージョン（`versions/` 配下の最新版） | **修正対応**（依存更新／PR作成） |
-| 旧バージョン（`versions/` 配下のアーカイブ） | **Dismiss**。既存分は一括close、新規発生時は影響を確認のうえclose |
-| git subtree 配下（`add-line-numbers/`、`code2map/`、`excel2md/`、`markitdown/`、`md2map/`） | **Dismiss**。subtree 元リポジトリ側で管理 |
-
-#### 運用フロー
-
-1. 新規アラート発生時、**Malware** タブか **Vulnerable** タブかを確認
-2. **Malware** → 場所を問わず修正
-3. **Vulnerable** → 発生場所を確認
-   - 最新バージョンディレクトリ → 修正対応
-   - 旧バージョン or git subtree 配下 → 影響なしを確認のうえ Dismiss
+| ルートの lockfile（`backend/uv.lock`、`frontend/package-lock.json`） | **修正対応**（依存更新／PR作成） |
 
 Dismiss したアラートは「同一 manifest × 同一パッケージ × 同一 CVE」の組み合わせでは再発生しませんが、同じパッケージに別の CVE が公開された場合は新規アラートとして再通知されます。
 
@@ -220,12 +224,14 @@ MIT License - 詳細は [LICENSE](LICENSE) を参照してください。
 
 ## 関連プロジェクト
 
-このリポジトリには以下の外部リポジトリを git subtree で追加しています。
+以下の外部ツールを依存関係として使用しています（uv により PyPI または git ソースからインストール。`backend/pyproject.toml` 参照）。
 
-| ディレクトリ | リポジトリ | 説明 |
+| パッケージ | リポジトリ | 説明 |
 |-------------|-----------|------|
-| `add-line-numbers/` | https://github.com/elvezjp/add-line-numbers | ファイルに行番号を追加するツール |
-| `code2map/` | https://github.com/elvezjp/code2map | ソースコード→マインドマップ変換ツール |
-| `excel2md/` | https://github.com/elvezjp/excel2md | Excel→CSVマークダウン変換ツール |
-| `markitdown/` | https://github.com/microsoft/markitdown | 各種ファイル形式をMarkdownに変換するツール |
-| `md2map/` | https://github.com/elvezjp/md2map | Markdown→マインドマップ変換ツール |
+| add-line-numbers | https://github.com/elvezjp/add-line-numbers | ファイルに行番号を追加するツール |
+| code2map | https://github.com/elvezjp/code2map | ソースコード→マインドマップ変換ツール |
+| excel2md | https://github.com/elvezjp/excel2md | Excel→CSVマークダウン変換ツール |
+| markitdown | https://github.com/microsoft/markitdown | 各種ファイル形式をMarkdownに変換するツール |
+| md2map | https://github.com/elvezjp/md2map | Markdown→マインドマップ変換ツール |
+
+ソースを参照したい場合は、各上流リポジトリを直接 clone してください（例: `git clone https://github.com/elvezjp/excel2md.git`）。これらのリポジトリは以前 git subtree として取り込まれており、その構成は `v0.1.2` タグに保存されています。
