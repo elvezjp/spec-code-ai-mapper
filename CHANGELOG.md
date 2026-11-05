@@ -7,6 +7,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - Unreleased
+
+### Security
+
+- **Raised the floor of the transitive dependencies `certifi` and `urllib3`** (Dependabot [#228](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/228))
+  - [GHSA-6q48-6c7w-9gw2](https://github.com/advisories/GHSA-6q48-6c7w-9gw2) (critical): `certifi` < 2026.10.18 bundled emSign root CAs whose intermediate CA keys were compromised
+  - [GHSA-vxq7-64xx-v4gw](https://github.com/advisories/GHSA-vxq7-64xx-v4gw) (high) / [GHSA-gh4c-6fx4-qh6g](https://github.com/advisories/GHSA-gh4c-6fx4-qh6g) (medium): `urllib3` < 2.8.0 could buffer an unbounded chunk-size line into memory, and could loop forever on chunked deflate streams
+  - Both are declared as `[tool.uv]` `constraint-dependencies` (`certifi>=2026.10.18`, `urllib3>=2.8.0`) in `backend/pyproject.toml`
+  - `backend/uv.lock` regenerated: `certifi` 2026.7.22 → 2026.10.23, `urllib3` 2.7.0 → 2.8.0
+- **Updated frontend development dependencies** (Dependabot [#227](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/227) / [#226](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/226) / [#225](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/225) / [#224](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/224) / [#223](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/223) / [#222](https://github.com/elvezjp/spec-code-ai-mapper/security/dependabot/222)): `vite` 8.0.16 → 8.1.6, `vitest` 4.1.11 → 4.1.12, `source-map-js` 1.2.1 → 1.2.2, `brace-expansion` 1.1.16 → 1.1.21 / 5.0.8 → 5.0.12
+  - `vite`: [GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm) (high), [GHSA-r825-w8mm-5pxw](https://github.com/advisories/GHSA-r825-w8mm-5pxw) (medium), [GHSA-698v-4r3x-3vcv](https://github.com/advisories/GHSA-698v-4r3x-3vcv) (medium) (command execution issues in the bundled launch-editor on Windows)
+  - `@vitest/mocker` (pulled in by `vitest`): [GHSA-xp26-3454-mjgp](https://github.com/advisories/GHSA-xp26-3454-mjgp) (medium) (Windows path traversal)
+  - `source-map-js`: [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q) (high, event-loop DoS); `brace-expansion`: [GHSA-q2hr-2g5m-vwhr](https://github.com/advisories/GHSA-q2hr-2g5m-vwhr) (medium, CPU DoS)
+  - These are development-only dependencies (dev server, build and tests) and are not included in the built frontend
+
 ## [0.2.0] - 2026-09-21
 
 This release retires the `versions/` directory in favor of a layout that keeps only the latest code at the repository root, together with security fixes and dependency updates.
