@@ -86,7 +86,7 @@ Results can be exported in Markdown format.
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.11.5+
 - Node.js 20.19+ (20.x), 22.12+ (22.x), or 24+
 - [uv](https://docs.astral.sh/uv/) package manager
 - AWS account (with Bedrock access) or Anthropic/OpenAI API key
